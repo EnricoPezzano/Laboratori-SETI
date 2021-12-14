@@ -58,6 +58,10 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
 	/*** Send the message through the socket (non blocking mode) ***/
 /*** TO BE DONE START ***/
 
+	// do { // vers_mire
+	// 	sent_bytes = write(ping_socket, message, msg_size);
+	// }while (sent_bytes < 0);
+
 	// if(send(ping_socket, &message, msg_size, MSG_DONTWAIT) == -1)
 	if(nonblocking_write_all(ping_socket, /*&*/message, msg_size) == -1) //(int fd, const void *ptr, size_t n)
 		fail_errno("nonblocking_write_all() error!");
@@ -79,6 +83,13 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
 	// recv_bytes = recv(ping_socket, answer_buffer, msg_size, MSG_DONTWAIT); //(int socket, void *buffer, size_t length, int flags);
 	// 	if((errno==EWOULDBLOCK)||(errno==EAGAIN))
 	// 		timeout*=2;
+
+	// struct timespec current_time; // vers_mire
+	// do{
+	// 	recv_bytes = recv(ping_socket, answer_buffer, msg_size, 0);
+	// 	clock_gettime(CLOCK_TYPE, &current_time);
+	// 	recv_errno = errno;
+	// }while((recv_bytes < 0 ) && (timespec_delta2milliseconds(&current_time, &send_time) < timeout/2) && (recv_errno == EAGAIN || recv_errno == EWOULDBLOCK));
 
 /*** TO BE DONE END ***/
 
@@ -138,6 +149,8 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
 	gai_hints.ai_family = AF_INET;
 	gai_hints.ai_socktype = SOCK_DGRAM;
 	gai_hints.ai_protocol = IPPROTO_UDP; // prova con 17->IPPROTO_UDP
+	gai_hints.ai_flags = AI_PASSIVE;
+
 
 /*** TO BE DONE END ***/
 
@@ -147,7 +160,7 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
     /*** change ping_socket behavior to NONBLOCKing using fcntl() ***/
 /*** TO BE DONE START ***/
 
-	//da cercare sul man
+	//da studiare sul man
 	if(fcntl(ping_socket, F_SETFL, O_NONBLOCK) == -1)
 		fail_errno("Error: fcntl couldn't change the socket behaviour to non-blocking.");
 
@@ -178,8 +191,13 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
     /*** connect the ping_socket UDP socket with the server ***/
 /*** TO BE DONE START ***/
 
-if (connect(ping_socket, pong_addrinfo->ai_addr, pong_addrinfo->ai_addrlen) == -1)
-	fail_errno("Error: connect() couldn't connect the UDP socket with the server.");
+	// struct sockaddr_in *ipv4; // vers_mire
+	// ipv4 = (struct sockaddr_in *)pong_addrinfo->ai_addr;
+	// if(connect(ping_socket,  (struct sockaddr *)pong_addrinfo->ai_addr, sizeof(struct sockaddr_in))<0)
+	// 	fail_errno("connect");
+
+	if (connect(ping_socket, pong_addrinfo->ai_addr, pong_addrinfo->ai_addrlen) == -1)
+		fail_errno("Error: connect() couldn't connect the UDP socket with the server.");
 
 /*** TO BE DONE END ***/
 
@@ -219,7 +237,7 @@ int main(int argc, char *argv[])
 
 	gai_hints.ai_family = AF_INET;    /* Allow IPv4 or IPv6 */
 	gai_hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
-	//gai_hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
+	gai_hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
 	gai_hints.ai_protocol = IPPROTO_TCP;          /* 0 = Any protocol */ // prova con IPPROTO_TCP
 	// gai_hints.ai_canonname = NULL;
 	// gai_hints.ai_addr = NULL;
@@ -244,6 +262,10 @@ int main(int argc, char *argv[])
     /*** create a new TCP socket and connect it with the server ***/
 /*** TO BE DONE START ***/
 
+	// ask_socket = socket(AF_INET, SOCK_STREAM, 0); // vers_mire (secondo me è meglio la nostra)
+	// if(ask_socket<0) fail_errno("Error socket");
+	// if(connect(ask_socket, (struct sockaddr *) ipv4, sizeof(struct sockaddr_in))<0) fail_errno("Error connect");
+
 	ask_socket = socket(server_addrinfo->ai_family, server_addrinfo->ai_socktype, server_addrinfo->ai_protocol);
 		if (ask_socket == -1)
 			fail_errno("Error creating socket: ");
@@ -259,7 +281,7 @@ int main(int argc, char *argv[])
 
     /*** Write the request on the TCP socket ***/
 /** TO BE DONE START ***/
-
+	// strlen(request) ?? -> secondo me è meglio come abbiamo fatto noi
 	if(write(ask_socket, /*&*/request, server_addrinfo->ai_addrlen/*, server_addrinfo->ai_flags*/) == -1) //(int fd, const void *buf, size_t count);
 		fail_errno("Error: write()'s execution failed.");
 
