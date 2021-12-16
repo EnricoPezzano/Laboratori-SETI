@@ -58,31 +58,40 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
 	/*** Send the message through the socket (non blocking mode) ***/
 /*** TO BE DONE START ***/
 
-	// do { // vers_mire
-	// 	sent_bytes = write(ping_socket, message, msg_size);
-	// }while (sent_bytes < 0);
+	do { // vers_mire
+		sent_bytes = write(ping_socket, message, msg_size);
+	}while (sent_bytes < 0);
 
-	// if(send(ping_socket, &message, msg_size, MSG_DONTWAIT) == -1)
-	if(nonblocking_write_all(ping_socket, /*&*/message, msg_size) == -1) //(int fd, const void *ptr, size_t n)
-		fail_errno("nonblocking_write_all() error!");
-	sent_bytes = msg_size;
+	// // if(send(ping_socket, message, msg_size, MSG_DONTWAIT) == -1)
+	// // if(write(ping_socket, message, msg_size) == -1)
+	//// if(nonblocking_write_all(ping_socket, /*&*/message, msg_size) == -1) //(int fd, const void *ptr, size_t n)
+	// 	fail_errno("nonblocking_write_all() error!");
+	// sent_bytes = msg_size;
 
 /*** TO BE DONE END ***/
 
 	/*** Receive answer through the socket (non blocking mode, with timeout) ***/
 /*** TO BE DONE START ***/
 
-	// da rivedere
-	/* Receive answer through the socket (blocking) */ //tcp del prof
-	for (int offset = 0; (offset + (recv_bytes = recv(ping_socket, answer_buffer + offset, sent_bytes - offset, MSG_DONTWAIT))) < msg_size; offset += recv_bytes) {
-		debug(" ... received %zd bytes back\n", recv_bytes);
-		if (recv_bytes < 0)
-			fail_errno("Error receiving data");
-	}
+	// // da rivedere
+	// /* Receive answer through the socket (blocking) */ //tcp del prof
+	// for (int offset = 0; (offset + (recv_bytes = recv(ping_socket, answer_buffer + offset, sent_bytes - offset, MSG_DONTWAIT))) < msg_size; offset += recv_bytes) {
+	// 	debug(" ... received %zd bytes back\n", recv_bytes);
+	// 	if (recv_bytes < 0)
+	// 		fail_errno("Error receiving data");
+	// }
 
-	// recv_bytes = recv(ping_socket, answer_buffer, msg_size, MSG_DONTWAIT); //(int socket, void *buffer, size_t length, int flags);
+	recv_bytes = recv(ping_socket, answer_buffer, msg_size, MSG_DONTWAIT);
+	printf("\n\nvwbvbrvrrevrie-->%zd", recv_bytes);
 	// 	if((errno==EWOULDBLOCK)||(errno==EAGAIN))
 	// 		timeout*=2;
+
+	/* twingo */
+	// for (int offset = 0; (offset + (recv_bytes = recv(ping_socket, answer_buffer + offset, sent_bytes - offset, MSG_DONTWAIT))) < msg_size; offset += recv_bytes) {
+	// 	debug(" ... received %zd bytes back\n", recv_bytes);
+	// 	if (recv_bytes < 0)
+	// 		fail_errno("Error receiving data");
+	// }
 
 	// struct timespec current_time; // vers_mire
 	// do{
@@ -191,13 +200,13 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
     /*** connect the ping_socket UDP socket with the server ***/
 /*** TO BE DONE START ***/
 
-	// struct sockaddr_in *ipv4; // vers_mire
-	// ipv4 = (struct sockaddr_in *)pong_addrinfo->ai_addr;
-	// if(connect(ping_socket,  (struct sockaddr *)pong_addrinfo->ai_addr, sizeof(struct sockaddr_in))<0)
-	// 	fail_errno("connect");
+	struct sockaddr_in *ipv4; // vers_mire
+	ipv4 = (struct sockaddr_in *)pong_addrinfo->ai_addr;
+	if(connect(ping_socket,  (struct sockaddr *)pong_addrinfo->ai_addr, sizeof(struct sockaddr_in))<0)
+		fail_errno("connect");
 
-	if (connect(ping_socket, pong_addrinfo->ai_addr, pong_addrinfo->ai_addrlen) == -1)
-		fail_errno("Error: connect() couldn't connect the UDP socket with the server.");
+	// if (connect(ping_socket, pong_addrinfo->ai_addr, pong_addrinfo->ai_addrlen) == -1)
+	// 	fail_errno("Error: connect() couldn't connect the UDP socket with the server.");
 
 /*** TO BE DONE END ***/
 
