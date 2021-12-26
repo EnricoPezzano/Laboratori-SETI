@@ -5,7 +5,7 @@ CFLAGS = -Ipingpong_lib
 BIN_DIR = bin
 DATA_DIR = data
 
-LDFLAGS = -L$(BIN_DIR) -lpingpong #-lrt (su mac non trova la libreria...)
+LDFLAGS = -L$(BIN_DIR) -lpingpong #-lrt
 PINGPONG_LIB=$(BIN_DIR)/libpingpong.a
 PONG = $(BIN_DIR)/pong_server
 UDP_PING = $(BIN_DIR)/udp_ping
@@ -58,11 +58,12 @@ $(DATA_DIR):
 
 # Utilities
 clean:
-	rm -rf $(BIN_DIR)/*.o $(BIN_DIR)/lib* $(BIN_DIR)/pong* $(BIN_DIR)/tcp* $(BIN_DIR)/udp*
+	rm -rf $(EXECS) $(BIN_DIR)/*.o $(PINGPONG_LIB)
 tgz: clean
 	rm -rf $(DATA_DIR)
 	cd ..; tar cvzf pingpong.tgz --exclude='pingpong/.idea' pingpong
 tgz-full: clean
 	rm -rf $(DATA_DIR)
 	cd ..; tar cvzf pingpong-full.tgz --exclude='pingpong-full/.idea' pingpong-full
+
 
