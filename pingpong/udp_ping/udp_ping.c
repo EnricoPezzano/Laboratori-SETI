@@ -58,14 +58,16 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
 	/*** Send the message through the socket (non blocking mode) ***/
 /*** TO BE DONE START ***/
 
-	do { // vers_mire
-		sent_bytes = write(ping_socket, message, msg_size);
-	}while (sent_bytes < 0);
+	// do { // vers_mire
+	// 	sent_bytes = write(ping_socket, message, msg_size);
+	// }while (sent_bytes < 0);
 
-	// // if(send(ping_socket, message, msg_size, MSG_DONTWAIT) == -1)
+			sent_bytes = send(ping_socket, message, msg_size, MSG_DONTWAIT); 
+			if(sent_bytes == -1) //fail_errno...
+	// // if(send(ping_socket, message, msg_size, MSG_DONTWAIT) == -1) //mi piace di più questo
 	// // if(write(ping_socket, message, msg_size) == -1)
 	//// if(nonblocking_write_all(ping_socket, /*&*/message, msg_size) == -1) //(int fd, const void *ptr, size_t n)
-	// 	fail_errno("nonblocking_write_all() error!");
+		fail_errno("nonblocking_write_all() error!");
 	// sent_bytes = msg_size;
 
 /*** TO BE DONE END ***/
@@ -82,7 +84,10 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
 	// }
 
 	recv_bytes = recv(ping_socket, answer_buffer, msg_size, MSG_DONTWAIT);
-	printf("\n\nvwbvbrvrrevrie-->%zd", recv_bytes);
+	printf("\n\nvwbvbrvrrevrie-->%zd", recv_bytes); //con webdev restutuisce -1 :(
+
+	recv_errno = errno; // vers lillo
+
 	// 	if((errno==EWOULDBLOCK)||(errno==EAGAIN))
 	// 		timeout*=2;
 
@@ -200,13 +205,13 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
     /*** connect the ping_socket UDP socket with the server ***/
 /*** TO BE DONE START ***/
 
-	struct sockaddr_in *ipv4; // vers_mire
-	ipv4 = (struct sockaddr_in *)pong_addrinfo->ai_addr;
-	if(connect(ping_socket,  (struct sockaddr *)pong_addrinfo->ai_addr, sizeof(struct sockaddr_in))<0)
-		fail_errno("connect");
+	// struct sockaddr_in *ipv4; // vers_mire
+	// ipv4 = (struct sockaddr_in *)pong_addrinfo->ai_addr;
+	// if(connect(ping_socket,  (struct sockaddr *)pong_addrinfo->ai_addr, sizeof(struct sockaddr_in))<0)
+	// 	fail_errno("connect");
 
-	// if (connect(ping_socket, pong_addrinfo->ai_addr, pong_addrinfo->ai_addrlen) == -1)
-	// 	fail_errno("Error: connect() couldn't connect the UDP socket with the server.");
+	if (connect(ping_socket, pong_addrinfo->ai_addr, pong_addrinfo->ai_addrlen) == -1)
+		fail_errno("Error: connect() couldn't connect the UDP socket with the server.");
 
 /*** TO BE DONE END ***/
 
@@ -247,7 +252,7 @@ int main(int argc, char *argv[])
 	gai_hints.ai_family = AF_INET;    /* Allow IPv4 or IPv6 */
 	gai_hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
 	gai_hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
-	gai_hints.ai_protocol = IPPROTO_TCP;          /* 0 = Any protocol */ // prova con IPPROTO_TCP
+	gai_hints.ai_protocol = IPPROTO_TCP; /* 0 = Any protocol */ // prova con IPPROTO_TCP
 	// gai_hints.ai_canonname = NULL;
 	// gai_hints.ai_addr = NULL;
 	// gai_hints.ai_next = NULL;
@@ -259,7 +264,7 @@ int main(int argc, char *argv[])
 
 // anche qui, è necessario fare questa cosa in 2 righe invece di una?
 	gai_rv = getaddrinfo(argv[1], argv[2], &gai_hints, &server_addrinfo);
-	if (gai_rv != 0)
+	if (gai_rv != 0) //da errore qui
 		fail_errno("getaddrinfo() error!");
 
 /*** TO BE DONE END ***/
@@ -291,7 +296,7 @@ int main(int argc, char *argv[])
     /*** Write the request on the TCP socket ***/
 /** TO BE DONE START ***/
 	// strlen(request) ?? -> secondo me è meglio come abbiamo fatto noi
-	if(write(ask_socket, /*&*/request, server_addrinfo->ai_addrlen/*, server_addrinfo->ai_flags*/) == -1) //(int fd, const void *buf, size_t count);
+	if(write(ask_socket, request, server_addrinfo->ai_addrlen/*, server_addrinfo->ai_flags*/) == -1) //(int fd, const void *buf, size_t count);
 		fail_errno("Error: write()'s execution failed.");
 
 /*** TO BE DONE END ***/
