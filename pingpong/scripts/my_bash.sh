@@ -19,3 +19,22 @@
 
 
 declare pippo;
+#!/bin/bash
+
+set -e
+
+#controllo se i file .dat sono presenti nella cartella "data"
+if [ ! -f ../data/tcp_throughput.dat ]; then
+    printf "\nUnable to find tcp_throughput source file\n\n"
+    exit 1
+fi
+
+if [ ! -f ../data/udp_throughput.dat ]; then
+    printf "\nUnable to find udp_throughput source file\n\n"
+    exit 1
+fi
+
+#crea variabile di sola lettura
+readonly InputTCPFile="../data/tcp_throughput.dat"
+
+#
