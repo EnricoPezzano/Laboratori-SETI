@@ -140,7 +140,7 @@ void run_webserver(const char *const port_as_str, char *www_root, const int *con
 void check_uids()
 {
 #ifndef PRETEND_TO_BE_ROOT
-	if (geteuid()) {
+	if (geteuid()) { //qua c'è un errore
 		fprintf(stderr, "The effective UID should be zero (that is, the executable should be owned by root and have the SETUID flag on).\n");
 		exit(EXIT_FAILURE);
 	}
