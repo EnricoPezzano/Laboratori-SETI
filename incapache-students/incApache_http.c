@@ -65,6 +65,16 @@ int get_new_UID(void)
      *** Be careful in order to avoid race conditions ***/
 /*** TO BE DONE 5.0 START ***/
 
+	// vers matte e ginger
+	// pthread_mutex_lock(&cookie_mutex);
+    // retval = ++CurUID % MAX_COOKIES;
+    // UserTracker[retval] = 0;
+	// pthread_mutex_unlock(&cookie_mutex);
+
+	CurUID++;
+	retval = CurUID % MAX_COOKIES;
+	UserTracker[retval] = 0;
+	CurUID = retval;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -82,6 +92,13 @@ int keep_track_of_UID(int myUID)
      *** Be careful in order to avoid race conditions ***/
 /*** TO BE DONE 5.0 START ***/
 
+	// vers matte e ginger
+	// pthread_mutex_lock(&cookie_mutex);
+    // newcount = ++UserTracker[myUID];
+	// pthread_mutex_unlock(&cookie_mutex);
+
+	UserTracker[myUID]++;
+	newcount = UserTracker[myUID]; // rivedere "be careful in order to avoid race conditions"
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -113,6 +130,11 @@ void send_response(int client_fd, int response_code, int cookie,
 	/*** Compute date of servicing current HTTP Request using a variant of gmtime() ***/
 /*** TO BE DONE 5.0 START ***/
 
+	// vers ginger
+	// if(gmtime_r(&now_t, &now_tm) == NULL)
+	// 	 fail_errno("Could not get the time from gmtime_r()");
+
+	my_timegm(&now_tm);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -143,6 +165,8 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size and file_modification_time ***/
 /*** TO BE DONE 5.0 START ***/
 
+	file_size = stat_p->st_size;
+    file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -162,6 +186,23 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 5.0 START ***/
 
+	// vers ginger
+	// mime_type = my_strdup(HTML_mime);
+	// stat_p = &stat_buffer;
+	// if(stat(HTML_404, stat_p)){
+	// 	fail_errno("stat");
+	// }
+	// file_size = stat_p -> st_size;
+	// file_modification_time = stat_p -> st_mtime;
+
+	struct stat tmp;
+	mime_type = get_mime_type(HTML_404);
+	if(stat_p == NULL) 
+		stat_p = &stat_buffer;
+    if(stat(HTML_404, stat_p) < 0)
+		fail_errno("Errore nella stat 404");
+    file_size = stat_p->st_size;
+    file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -174,6 +215,23 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_501 ***/
 /*** TO BE DONE 5.0 START ***/
 
+	// vers ginger
+	// mime_type = my_strdup(HTML_mime);
+	// stat_p = &stat_buffer;
+	// if(stat(HTML_501, stat_p)){
+	// 	fail_errno("stat");
+	// }
+	// file_size = stat_p -> st_size;
+	// file_modification_time = stat_p -> st_mtime;
+
+	struct stat tmp;
+	mime_type = get_mime_type(HTML_501);
+	if(stat_p == NULL)
+		stat_p = &stat_buffer;
+    if(stat(HTML_501, stat_p) < 0)
+		fail_errno("Errore nella stat 501");
+    file_size = stat_p->st_size;
+    file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -186,6 +244,13 @@ void send_response(int client_fd, int response_code, int cookie,
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
 
+	// vers ginger
+		//Aggiungo un anno al tempo di modifica del file così facendo il cookie sarà 'permanente'
+	// now_tm.tm_year++;
+	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
+	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, time_as_string);
+
+	snprintf(http_header + strlen(http_header), sizeof(http_header), "\r\nSet-Cookie: client=%d; Expires=Wed, 19 Jun 2021 10:18:14 GMT+1");
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -202,6 +267,12 @@ void send_response(int client_fd, int response_code, int cookie,
 		     see gmtime and strftime ***/
 /*** TO BE DONE 5.0 START ***/
 
+	//  vers ginger
+	// if(gmtime_r(&file_modification_time,&file_modification_tm)==NULL)
+	// 	fail_errno("Could not get the time from gmtime_r()");
+	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm);
+
+	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", gmtime(&file_modification_time));
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -233,6 +304,8 @@ void send_response(int client_fd, int response_code, int cookie,
 		/*** send fd file on client_fd, then close fd; see syscall sendfile  ***/
 /*** TO BE DONE 5.0 START ***/
 
+	if (sendfile(client_fd, fd, NULL, file_size) == -1) //da studiare sul man
+		fail_errno("Errore nella sendfile");
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -290,6 +363,10 @@ void manage_http_requests(int client_fd
 		 *** filename, and protocol ***/
 /*** TO BE DONE 5.0 START ***/
 
+	//divido la stringa in 3 parti
+    method_str = strtok_r(http_request_line, " ", &strtokr_save);
+    filename = strtok_r(NULL, " ", &strtokr_save);
+    protocol = strtok_r(NULL, "\r\n", &strtokr_save);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -327,6 +404,19 @@ void manage_http_requests(int client_fd
                                 /*** parse the cookie in order to get the UserID and count the number of requests coming from this client ***/
 /*** TO BE DONE 5.0 START ***/
 
+	//  vers ginger
+	// ++strtokr_save; //Togliamo i ':' dalla stringa
+	// option_val = strtok_r(NULL, " \r", &strtokr_save);
+	// sscanf(option_val, "%d", &UIDcookie);
+
+	char *iduser = "UserID=";
+    option_val = strtok_r(NULL, "\r\n", &strtokr_save);
+    //rimuovo gli spazi vuoti
+    while (option_val != NULL && *option_val == ' ')
+        ++option_val;
+
+    if(option_val != NULL && !strncmp(option_val, iduser, strlen(iduser)))
+		sscanf(option_val + strlen(iduser), "%d", &UIDcookie);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -337,6 +427,19 @@ void manage_http_requests(int client_fd
 				 *** and possibly add METHOD_CONDITIONAL flag to http_method
 /*** TO BE DONE 5.0 START ***/
 
+	//  vers ginger
+	// if( strcmp(option_name, "If-Modified-Since") == 0 ){
+	// 	http_method = METHOD_CONDITIONAL;
+	// 	++strtokr_save;
+	// 	option_val = strtok_r(NULL, " \r", &strtokr_save);
+	// 	strptime(option_val,"%a, %d %b %Y %H:%M:%S GMT",&since_tm);
+	// }
+
+	option_name = strtok_r(http_option_line, ": ", &strtokr_save);
+	option_val = strtok_r(NULL, "GMT", &strtokr_save);
+
+	if(strcmp(option_name, "If-Modified-Since") == 0)
+		http_method += METHOD_CONDITIONAL;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -390,6 +493,16 @@ void manage_http_requests(int client_fd
 				 ***/
 /*** TO BE DONE 5.0 START ***/
 
+	//  vers ginger
+	// if (stat(filename, stat_p)) //All'interno di stat_p verranno messe le informazioni relative al file con come filename
+	// 	fail_errno("stat");
+	// if(stat_p->st_mtime > my_timegm(&since_tm)) //Confronto le date dei due file per vedere se è stato modificato oppure no
+	// 	http_method = METHOD_NOT_CHANGED;
+
+	if(difftime(my_timegm(&since_tm), stat_p->st_mtime) == 0)
+        http_method = METHOD_NOT_CHANGED;
+    else
+		http_method -= METHOD_CONDITIONAL;
 
 /*** TO BE DONE 5.0 END ***/
 
