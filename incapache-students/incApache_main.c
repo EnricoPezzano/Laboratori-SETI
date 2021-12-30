@@ -36,7 +36,7 @@ void create_listening_socket(const char *const port_as_str)
 	if ((listen_fd = socket(server_addr->ai_family, server_addr->ai_socktype, server_addr->ai_protocol)) == -1)
 		fail_errno("Could not allocate socket descriptor");
 	if (bind(listen_fd, server_addr->ai_addr, server_addr->ai_addrlen) == -1)
-		fail_errno("Could not bind socket");
+		fail_errno("Could not bind socket"); // qua c'è un errore
 	freeaddrinfo(server_addr);
 	if (listen(listen_fd, BACKLOG) == -1)
 		fail_errno("Could not listen on socket");
@@ -76,17 +76,17 @@ void run_webserver(const char *const port_as_str, char *www_root, const int *con
 /*** TO BE DONE 5.0 START ***/
 
 	// vers matte e ginger
-	// if(chroot(www_root) != 0) {
-	//    fail_errno("Cannot change the root directory");
-	// }
-    // create_listening_socket(port_as_str);
-    // drop_privileges();
+	if(chroot(www_root) != 0) {
+	   fail_errno("Cannot change the root directory");
+	}
+    create_listening_socket(port_as_str);
+    drop_privileges();
 
-	setuid(0);  //pensiamo che debba nascere con UID=0;
-	chroot(www_root);
-	create_listening_socket(port_as_str);
-	setuid(635);	
-	drop_privileges();
+	// setuid(0);  //pensiamo che debba nascere con UID=0;
+	// chroot(www_root);
+	// create_listening_socket(port_as_str);
+	// setuid(635);	
+	// drop_privileges();
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -140,7 +140,7 @@ void run_webserver(const char *const port_as_str, char *www_root, const int *con
 void check_uids()
 {
 #ifndef PRETEND_TO_BE_ROOT
-	if (geteuid()) { //qua c'è un errore
+	if (geteuid()) {
 		fprintf(stderr, "The effective UID should be zero (that is, the executable should be owned by root and have the SETUID flag on).\n");
 		exit(EXIT_FAILURE);
 	}
