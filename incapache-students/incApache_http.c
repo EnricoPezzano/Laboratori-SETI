@@ -216,7 +216,7 @@ void send_response(int client_fd, int response_code, int cookie,
 
 	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
 	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
-	// printf("ciaooo");printf("%d", now_tm.tm_year);
+	// printf("%d", now_tm.tm_year); // test
 	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
@@ -234,11 +234,12 @@ void send_response(int client_fd, int response_code, int cookie,
 		     see gmtime and strftime ***/
 /*** TO BE DONE 5.0 START ***/
 
-	gmtime_r(&file_modification_time, &file_modification_tm); // saves the return value in &file_modification_tm
-	if(&file_modification_tm == NULL)
+	gmtime_r(&file_modification_time, &file_modification_tm); // saves the return value in a struct * tm (&file_modification_tm)
+	if(&file_modification_tm == NULL) //[...] or null pointer on error [...] (cppreference.com)
 			fail_errno("Could not get the time from gmtime_r()");
 
-	strftime(time_as_string, MAX_TIME_STR, "ciaoo>>>>>%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm);
+	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm); // salva le informazioni di &file_modification_tm dentro il buffer time_as_string
+			//(char *restrict s, size_t maxsize, const char *restrict format, const struct tm *restrict timeptr);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -329,7 +330,7 @@ void manage_http_requests(int client_fd
 		 *** filename, and protocol ***/
 /*** TO BE DONE 5.0 START ***/
 
-	//divido la stringa in 3 parti
+	//divido la stringa in 3 parti (ripassa sul man)
     method_str = strtok_r(http_request_line, " ", &strtokr_save);
     filename = strtok_r(NULL, " ", &strtokr_save);
     protocol = strtok_r(NULL, "\r\n", &strtokr_save);
@@ -369,7 +370,7 @@ void manage_http_requests(int client_fd
 			    if ( strcmp(option_name, "Cookie") == 0 ) {
                                 /*** parse the cookie in order to get the UserID and count the number of requests coming from this client ***/
 /*** TO BE DONE 5.0 START ***/
-printf("\nda rivedere qui:\n>>>>> ");
+printf("\ndebug start...");
 	//  vers ginger
 	// ++strtokr_save; //Togliamo i ':' dalla stringa
 	// option_val = strtok_r(NULL, " \r", &strtokr_save);
@@ -383,7 +384,7 @@ printf("\nda rivedere qui:\n>>>>> ");
 
     if(option_val != NULL && !strncmp(option_val, iduser, strlen(iduser)))
 		sscanf(option_val + strlen(iduser), "%d", &UIDcookie);
-
+printf("\ndebug end...");
 /*** TO BE DONE 5.0 END ***/
 
                             }
