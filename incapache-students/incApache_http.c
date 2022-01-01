@@ -260,7 +260,7 @@ void send_response(int client_fd, int response_code, int cookie,
 	// 	fail_errno("Could not get the time from gmtime_r()");
 	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm);
 
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMTciao", gmtime(&file_modification_time));
+	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMTciao", gmtime(&file_modification_tm));
 
 /*** TO BE DONE 5.0 END ***/
 
