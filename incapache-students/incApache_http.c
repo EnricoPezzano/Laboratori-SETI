@@ -65,16 +65,12 @@ int get_new_UID(void)
      *** Be careful in order to avoid race conditions ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// vers matte e ginger
-	// pthread_mutex_lock(&cookie_mutex);
-    // retval = ++CurUID % MAX_COOKIES;
-    // UserTracker[retval] = 0;
-	// pthread_mutex_unlock(&cookie_mutex);
-
+	pthread_mutex_lock(&cookie_mutex);
 	CurUID++;
 	retval = CurUID % MAX_COOKIES;
 	UserTracker[retval] = 0;
 	CurUID = retval;
+	pthread_mutex_unlock(&cookie_mutex);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -92,13 +88,10 @@ int keep_track_of_UID(int myUID)
      *** Be careful in order to avoid race conditions ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// vers matte e ginger
-	// pthread_mutex_lock(&cookie_mutex);
-    // newcount = ++UserTracker[myUID];
-	// pthread_mutex_unlock(&cookie_mutex);
-
+	pthread_mutex_lock(&cookie_mutex);
 	UserTracker[myUID]++;
-	newcount = UserTracker[myUID]; // rivedere "be careful in order to avoid race conditions"
+	newcount = UserTracker[myUID];
+	pthread_mutex_unlock(&cookie_mutex);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -130,11 +123,10 @@ void send_response(int client_fd, int response_code, int cookie,
 	/*** Compute date of servicing current HTTP Request using a variant of gmtime() ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// vers ginger
-	// if(gmtime_r(&now_t, &now_tm) == NULL)
-	// 	 fail_errno("Could not get the time from gmtime_r()");
+	// my_timegm(&now_tm); // ok?
 
-	my_timegm(&now_tm);
+	if(gmtime_r(&now_t, &now_tm) == NULL) // ok?
+		fail_errno("Cannot get the time from gmtime_r()");
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -244,13 +236,9 @@ void send_response(int client_fd, int response_code, int cookie,
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// vers ginger
-		//Aggiungo un anno al tempo di modifica del file così facendo il cookie sarà 'permanente'
-	// now_tm.tm_year++;
-	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
-	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, time_as_string);
-
-	snprintf(http_header + strlen(http_header), sizeof(http_header), "\r\nSet-Cookie: client=%d; Expires=Wed, 19 Jun 2021 10:18:14 GMT+1");
+	now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo (2023)
+	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -272,7 +260,7 @@ void send_response(int client_fd, int response_code, int cookie,
 	// 	fail_errno("Could not get the time from gmtime_r()");
 	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm);
 
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", gmtime(&file_modification_time));
+	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMTciao", gmtime(&file_modification_time));
 
 /*** TO BE DONE 5.0 END ***/
 
