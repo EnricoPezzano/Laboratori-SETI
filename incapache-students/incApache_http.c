@@ -122,11 +122,9 @@ void send_response(int client_fd, int response_code, int cookie,
 
 	/*** Compute date of servicing current HTTP Request using a variant of gmtime() ***/
 /*** TO BE DONE 5.0 START ***/
-printf("\nda rivedere qui:\n>>>>> ");
-	// my_timegm(&now_tm); // ok?
 
-	if(gmtime_r(&now_t, &now_tm) == NULL) // ok?
-		fail_errno("Cannot get the time from gmtime_r()");
+	if(my_timegm(&now_tm) == -1) // ret = mktime(tm);
+		fail_errno("Cannot get the time");
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -177,7 +175,7 @@ printf("\nda rivedere qui:\n>>>>> ");
 
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 5.0 START ***/
-
+printf("\nda rivedere qui:\n>>>>> ");
 	// vers ginger
 	// mime_type = my_strdup(HTML_mime);
 	// stat_p = &stat_buffer;
@@ -236,7 +234,7 @@ printf("\nda rivedere qui:\n>>>>> ");
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
 
-	now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo (2023)
+	now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE);
 
@@ -257,7 +255,7 @@ printf("\nda rivedere qui:\n>>>>> ");
 
 printf("\nda rivedere qui:\n>>>>> ");
 	gmtime_r(&file_modification_time, &file_modification_tm);
-	if(file_modification_tm == NULL)
+	if(&file_modification_tm == NULL)
 			fail_errno("Could not get the time from gmtime_r()");
 
 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm);
