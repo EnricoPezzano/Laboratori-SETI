@@ -78,20 +78,20 @@ pthread_mutex_t mime_mutex = PTHREAD_MUTEX_INITIALIZER;
 	 *** connection_no[i] ***/
 /*** TO BE DONE 5.1 START ***/
 
-	if (to_join[conn_no]==NULL)
+	if (to_join[conn_no] == NULL)
 		return;
 
-	for (i=MAX_CONNECTIONS; i < MAX_THREADS; ++i)
+	for (i=MAX_CONNECTIONS; i<MAX_THREADS; ++i)
 		if (to_join[conn_no] == &thread_ids[i])
 			break;
 
-	if (pthread_join(thread_ids[i],NULL)==-1)
-		fail_errno("Could not join all the threads");
+	if (pthread_join(thread_ids[i],NULL) == -1)
+		fail_errno("Cannot join all the threads");
 	--no_response_threads[conn_no];
-	if(no_response_threads[conn_no] == 0)
-		++no_free_threads;	//no_free_threads vale 16
-	connection_no[i]= FREE_SLOT;
-	to_join[conn_no]=NULL;
+	if(no_response_threads[conn_no] == 0) // ripassa questo passaggio
+		++no_free_threads;	// vale 16
+	connection_no[i] = FREE_SLOT;
+	to_join[conn_no] = NULL;
 
 /*** TO BE DONE 5.1 END ***/
 
@@ -112,17 +112,17 @@ pthread_mutex_t mime_mutex = PTHREAD_MUTEX_INITIALIZER;
 /*** TO BE DONE 5.1 START ***/
 
 	if (to_join[thrd_no] != NULL){
-		conn_no=connection_no[thrd_no];
-		for(i=MAX_CONNECTIONS; i < MAX_THREADS; ++i)
+		conn_no = connection_no[thrd_no];
+		for(i=MAX_CONNECTIONS; i<MAX_THREADS; ++i)
 			if(to_join[thrd_no] == &thread_ids[i])
 				break;
 		
-		if(pthread_join(thread_ids[i],NULL)<0)
-			fail_errno("Could not join the thread");
+		if(pthread_join(thread_ids[i],NULL) == -1)
+			fail_errno("Cannot join the thread");
 
 		pthread_mutex_lock(&threads_mutex);
 		--no_response_threads[conn_no];
-		if(no_response_threads[conn_no]==0)
+		if(no_response_threads[conn_no] == 0)
 			++no_free_threads;
 		connection_no[i]= FREE_SLOT;
 		debug("\t... join_prev_thread(%d): joining with %lu, connection %d\n",thrd_no,i,conn_no);

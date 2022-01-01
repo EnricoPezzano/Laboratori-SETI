@@ -75,18 +75,11 @@ void run_webserver(const char *const port_as_str, char *www_root, const int *con
 	 *** listen_fd, and eventually drop root privileges ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// vers matte e ginger
-	if(chroot(www_root) != 0) {
+	if(chroot(www_root) == -1)
 	   fail_errno("Cannot change the root directory");
-	}
+
     create_listening_socket(port_as_str);
     drop_privileges();
-
-	// setuid(0);  //pensiamo che debba nascere con UID=0;
-	// chroot(www_root);
-	// create_listening_socket(port_as_str);
-	// setuid(635);	
-	// drop_privileges();
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -120,7 +113,7 @@ void run_webserver(const char *const port_as_str, char *www_root, const int *con
 		/*** create PTHREAD number i, running client_connection_thread() ***/
 /*** TO BE DONE 5.0 START ***/
 
-	if(pthread_create(&thread_ids[i], NULL, client_connection_thread, &connection_no[i]) != 0)
+	if(pthread_create(&thread_ids[i], NULL, client_connection_thread, &connection_no[i]) != 0) // it returns an error number
 		fail_errno("Cannot create thread");
 
 /*** TO BE DONE 5.0 END ***/
