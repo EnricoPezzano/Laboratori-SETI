@@ -122,7 +122,7 @@ void send_response(int client_fd, int response_code, int cookie,
 
 	/*** Compute date of servicing current HTTP Request using a variant of gmtime() ***/
 /*** TO BE DONE 5.0 START ***/
-
+printf("\nda rivedere qui:\n>>>>> ");
 	// my_timegm(&now_tm); // ok?
 
 	if(gmtime_r(&now_t, &now_tm) == NULL) // ok?
@@ -206,7 +206,7 @@ void send_response(int client_fd, int response_code, int cookie,
 
 			/*** compute file_size, mime_type, and file_modification_time of HTML_501 ***/
 /*** TO BE DONE 5.0 START ***/
-
+printf("\nda rivedere qui:\n>>>>> ");
 	// vers ginger
 	// mime_type = my_strdup(HTML_mime);
 	// stat_p = &stat_buffer;
@@ -255,12 +255,12 @@ void send_response(int client_fd, int response_code, int cookie,
 		     see gmtime and strftime ***/
 /*** TO BE DONE 5.0 START ***/
 
-	//  vers ginger
-	// if(gmtime_r(&file_modification_time,&file_modification_tm)==NULL)
-	// 	fail_errno("Could not get the time from gmtime_r()");
-	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm);
+printf("\nda rivedere qui:\n>>>>> ");
+	gmtime_r(&file_modification_time, &file_modification_tm);
+	if(file_modification_tm == NULL)
+			fail_errno("Could not get the time from gmtime_r()");
 
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMTciao", gmtime(&file_modification_tm));
+	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -391,7 +391,7 @@ void manage_http_requests(int client_fd
 			    if ( strcmp(option_name, "Cookie") == 0 ) {
                                 /*** parse the cookie in order to get the UserID and count the number of requests coming from this client ***/
 /*** TO BE DONE 5.0 START ***/
-
+printf("\nda rivedere qui:\n>>>>> ");
 	//  vers ginger
 	// ++strtokr_save; //Togliamo i ':' dalla stringa
 	// option_val = strtok_r(NULL, " \r", &strtokr_save);
@@ -414,7 +414,7 @@ void manage_http_requests(int client_fd
 				/*** parse option line, recognize "If-Modified-Since" option,
 				 *** and possibly add METHOD_CONDITIONAL flag to http_method
 /*** TO BE DONE 5.0 START ***/
-
+printf("\nda rivedere qui:\n>>>>> ");
 	//  vers ginger
 	// if( strcmp(option_name, "If-Modified-Since") == 0 ){
 	// 	http_method = METHOD_CONDITIONAL;
@@ -480,7 +480,7 @@ void manage_http_requests(int client_fd
 				 *** Use something like timegm() to convert from struct tm to time_t
 				 ***/
 /*** TO BE DONE 5.0 START ***/
-
+printf("\nda rivedere qui:\n>>>>> ");
 	//  vers ginger
 	// if (stat(filename, stat_p)) //All'interno di stat_p verranno messe le informazioni relative al file con come filename
 	// 	fail_errno("stat");
