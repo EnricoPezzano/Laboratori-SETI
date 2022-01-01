@@ -175,24 +175,14 @@ void send_response(int client_fd, int response_code, int cookie,
 
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 5.0 START ***/
-printf("\nda rivedere qui:\n>>>>> ");
-	// vers ginger
-	// mime_type = my_strdup(HTML_mime);
-	// stat_p = &stat_buffer;
-	// if(stat(HTML_404, stat_p)){
-	// 	fail_errno("stat");
-	// }
-	// file_size = stat_p -> st_size;
-	// file_modification_time = stat_p -> st_mtime;
 
-	struct stat tmp;
-	mime_type = get_mime_type(HTML_404);
-	if(stat_p == NULL) 
-		stat_p = &stat_buffer;
-    if(stat(HTML_404, stat_p) < 0)
-		fail_errno("Errore nella stat 404");
-    file_size = stat_p->st_size;
-    file_modification_time = stat_p->st_mtime;
+	mime_type = my_strdup(HTML_mime);
+	stat_p = &stat_buffer;
+	if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
+		fail_errno("stat error(404)");
+	
+	file_size = stat_p->st_size;
+	file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -204,24 +194,14 @@ printf("\nda rivedere qui:\n>>>>> ");
 
 			/*** compute file_size, mime_type, and file_modification_time of HTML_501 ***/
 /*** TO BE DONE 5.0 START ***/
-printf("\nda rivedere qui:\n>>>>> ");
-	// vers ginger
-	// mime_type = my_strdup(HTML_mime);
-	// stat_p = &stat_buffer;
-	// if(stat(HTML_501, stat_p)){
-	// 	fail_errno("stat");
-	// }
-	// file_size = stat_p -> st_size;
-	// file_modification_time = stat_p -> st_mtime;
 
-	struct stat tmp;
-	mime_type = get_mime_type(HTML_501);
-	if(stat_p == NULL)
-		stat_p = &stat_buffer;
-    if(stat(HTML_501, stat_p) < 0)
-		fail_errno("Errore nella stat 501");
-    file_size = stat_p->st_size;
-    file_modification_time = stat_p->st_mtime;
+	mime_type = my_strdup(HTML_mime);
+	stat_p = &stat_buffer;
+	if(stat(HTML_501, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
+		fail_errno("stat error(501)");
+	
+	file_size = stat_p->st_size;
+	file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -234,10 +214,10 @@ printf("\nda rivedere qui:\n>>>>> ");
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
 
-	now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
-	printf("ciaooo");printf("%d", now_tm.tm_year);
-	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE);
+	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
+	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
+	// printf("ciaooo");printf("%d", now_tm.tm_year);
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -254,12 +234,11 @@ printf("\nda rivedere qui:\n>>>>> ");
 		     see gmtime and strftime ***/
 /*** TO BE DONE 5.0 START ***/
 
-printf("\nda rivedere qui:\n>>>>> ");
-	gmtime_r(&file_modification_time, &file_modification_tm);
+	gmtime_r(&file_modification_time, &file_modification_tm); // saves the return value in &file_modification_tm
 	if(&file_modification_tm == NULL)
 			fail_errno("Could not get the time from gmtime_r()");
 
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm);
+	strftime(time_as_string, MAX_TIME_STR, "ciaoo>>>>>%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm);
 
 /*** TO BE DONE 5.0 END ***/
 
