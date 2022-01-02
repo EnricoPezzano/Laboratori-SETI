@@ -214,10 +214,10 @@ void send_response(int client_fd, int response_code, int cookie,
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
 printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-----------------------------------------------\n");
-	now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
+	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
+	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	// printf("%d", now_tm.tm_year); // test
-	// snprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; %s;", cookie, COOKIE_EXPIRE); // ok
+	snprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; %s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
 
