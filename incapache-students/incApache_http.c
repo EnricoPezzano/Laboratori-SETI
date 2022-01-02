@@ -377,7 +377,7 @@ printf("\ndebug start...");
 	// sscanf(option_val, "%d", &UIDcookie);
 
 	char *iduser = "UserID=";
-	printf("%s --- %c", strtokr_save, &option_val);
+	printf("%s --- %c", strtokr_save, option_val);
     option_val = strtok_r(NULL, "\r\n", &strtokr_save); // '\r' è il rtorno a capo
     
     while(option_val != NULL && *option_val == ' ') // se non sono arrivato in fondo e il carattere a cui sto puntando è ' '
