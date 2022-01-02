@@ -217,7 +217,7 @@ void send_response(int client_fd, int response_code, int cookie,
 	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
 	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	// printf("%d", now_tm.tm_year); // test
-	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE); // ok
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; %s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -379,7 +379,7 @@ printf("\ndebug start...");
 	char *iduser = "UserID=";
 	printf("%s --- %s", strtokr_save, option_val); // test
     option_val = strtok_r(NULL, "\r\n", &strtokr_save); // '\r' è il rtorno a capo
-    
+    printf("%s --- %s", strtokr_save, option_val); // test
     while(option_val != NULL && *option_val == ' ') // se non sono arrivato in fondo e il carattere a cui sto puntando è ' '
         option_val++; // rimuovo gli spazi vuoti
 
