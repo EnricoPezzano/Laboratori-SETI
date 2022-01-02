@@ -231,6 +231,7 @@ void send_response(int client_fd, int response_code, int cookie,
 	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	// printf("%d", now_tm.tm_year); // test
 
+// da finire
 	now_tm.tm_hour++;
 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	sprintf(http_header + strlen(http_header),"\r\nSet-Cookie: UserID=%d; Expires=%s;", cookie, time_as_string);
@@ -290,7 +291,7 @@ void send_response(int client_fd, int response_code, int cookie,
 /*** TO BE DONE 5.0 START ***/
 
 	if (sendfile(client_fd, fd, NULL, file_size) == -1) //da studiare sul man
-		fail_errno("Errore nella sendfile");
+		fail_errno("cannot send fd file on client_fd");
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -414,10 +415,13 @@ void manage_http_requests(int client_fd
 //     option_val++; // rimuovo gli spazi vuoti
 // sscanf(option_val, "%d", &UIDcookie);
 
-	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	UIDcookie = atoi(strtokr_save);
-	printf("UserID Cookie=%d\n", UIDcookie); // debug("UserID Cookie=%d\n", UIDcookie);
-	// client provided UID Cookie 0 for the 4 time (stampa a terminale di test)
+	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
+	// UIDcookie = atoi(strtokr_save);
+	// printf("UserID Cookie=%d\n", UIDcookie); // debug("UserID Cookie=%d\n", UIDcookie);
+
+	char* aux = strtok_r(NULL, "=", &strtokr_save);
+	option_val = strtok_r(NULL, " ", &strtokr_save);
+	UIDcookie = atoi(option_val);
 
 	// check test
 	// printf("%s --- %s", strtokr_save, option_val); 
