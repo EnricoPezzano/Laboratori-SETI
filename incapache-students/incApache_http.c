@@ -377,13 +377,15 @@ printf("\ndebug start...");
 	// sscanf(option_val, "%d", &UIDcookie);
 
 	char *iduser = "UserID=";
-    option_val = strtok_r(NULL, "\r\n", &strtokr_save);
-    //rimuovo gli spazi vuoti
-    while (option_val != NULL && *option_val == ' ')
-        ++option_val;
+	printf("%s --- %d", strtokr_save, option_val);
+    option_val = strtok_r(NULL, "\r\n", &strtokr_save); // '\r' è il rtorno a capo
+    
+    while(option_val != NULL && *option_val == ' ') // se non sono arrivato in fondo e il carattere a cui sto puntando è ' '
+        option_val++; // rimuovo gli spazi vuoti
 
     if(option_val != NULL && !strncmp(option_val, iduser, strlen(iduser)))
 		sscanf(option_val + strlen(iduser), "%d", &UIDcookie);
+
 printf("\ndebug end...");
 /*** TO BE DONE 5.0 END ***/
 
