@@ -185,9 +185,9 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// stat_p = &stat_buffer;
-	// if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-	// 	fail_errno("stat error(404)");
+	stat_p = &stat_buffer;
+	if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
+		fail_errno("stat error(404)");
 	
 	file_size = stat_p->st_size;
 	mime_type = get_mime_type(HTML_404);
