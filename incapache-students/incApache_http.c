@@ -370,44 +370,39 @@ void manage_http_requests(int client_fd
 			    if ( strcmp(option_name, "Cookie") == 0 ) {
                                 /*** parse the cookie in order to get the UserID and count the number of requests coming from this client ***/
 /*** TO BE DONE 5.0 START ***/
-printf("\ndebug start...\n\n");
 
-char test[80], blah[80];
-char *sep = "\\/:;=-";
-char *word, *phrase, *brkt, *brkb;
+	// man strtok_r example :)
+// char test[80], blah[80];
+// char *sep = "\\/:;=-";
+// char *word, *phrase, *brkt, *brkb;
+// strcpy(test, "This;is.a:test:of=the/string\\tokenizer-function.");
+// for (word = strtok_r(test, sep, &brkt);
+// 	word;
+// 	word = strtok_r(NULL, sep, &brkt))
+// {
+// 	strcpy(blah, "blah:blat:blab:blag");
+// 	for (phrase = strtok_r(blah, sep, &brkb);
+// 		phrase;
+// 		phrase = strtok_r(NULL, sep, &brkb))
+// 	{
+// 		printf("So far we're at %s:%s\n", word, phrase);
+// 	}
+// }
 
-strcpy(test, "This;is.a:test:of=the/string\\tokenizer-function.");
+// trial
+// char *iduser = "UserID=";
+// option_val =  
+// while(option_val != NULL && *option_val == ' ') // se non sono arrivato in fondo e il carattere a cui sto puntando è ' '
+//     option_val++; // rimuovo gli spazi vuoti
+// sscanf(option_val, "%d", &UIDcookie);
 
-for (word = strtok_r(test, sep, &brkt);
-	word;
-	word = strtok_r(NULL, sep, &brkt))
-{
-	strcpy(blah, "blah:blat:blab:blag");
+	UIDcookie = atoi(strtok_r(NULL, " \n\r=", &strtokr_save)); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
+	debug("UserID Cookie=%d\n", UIDcookie);
+	// come faccio a contare il numero di richieste in arrivo dal client?
 
-	for (phrase = strtok_r(blah, sep, &brkb);
-		phrase;
-		phrase = strtok_r(NULL, sep, &brkb))
-	{
-		printf("So far we're at %s:%s\n", word, phrase);
-	}
-}
+	// check test
+	// printf("%s --- %s", strtokr_save, option_val); 
 
-	//  vers ginger
-	// ++strtokr_save; //Togliamo i ':' dalla stringa
-	// option_val = strtok_r(NULL, "\r", &strtokr_save);
-	// sscanf(option_val, "%d", &UIDcookie);
-
-	char *iduser = "UserID=";
-    option_val = strtok_r(NULL, "\r", &strtokr_save); // '\r' è il ritorno a capo e il separatore
-
-    while(option_val != NULL && *option_val == ' ') // se non sono arrivato in fondo e il carattere a cui sto puntando è ' '
-        option_val++; // rimuovo gli spazi vuoti
-
-    sscanf(option_val, "%d", &UIDcookie);
-
-	printf("%s --- %s", strtokr_save, option_val); // test
-
-printf("\ndebug end...");
 /*** TO BE DONE 5.0 END ***/
 
                             }
@@ -416,8 +411,8 @@ printf("\ndebug end...");
 				/*** parse option line, recognize "If-Modified-Since" option,
 				 *** and possibly add METHOD_CONDITIONAL flag to http_method
 /*** TO BE DONE 5.0 START ***/
-printf("\nda rivedere qui:\n>>>>> ");
-	//  vers ginger
+
+	// trial
 	// if( strcmp(option_name, "If-Modified-Since") == 0 ){
 	// 	http_method = METHOD_CONDITIONAL;
 	// 	++strtokr_save;
@@ -425,8 +420,8 @@ printf("\nda rivedere qui:\n>>>>> ");
 	// 	strptime(option_val,"%a, %d %b %Y %H:%M:%S GMT",&since_tm);
 	// }
 
-	option_name = strtok_r(http_option_line, ": ", &strtokr_save);
-	option_val = strtok_r(NULL, "GMT", &strtokr_save);
+	option_name = strtok_r(http_option_line, ": ", &strtokr_save); // option_line parsing and storing in option_name
+	// option_val = strtok_r(NULL, "GMT", &strtokr_save);
 
 	if(strcmp(option_name, "If-Modified-Since") == 0)
 		http_method += METHOD_CONDITIONAL;
@@ -482,17 +477,17 @@ printf("\nda rivedere qui:\n>>>>> ");
 				 *** Use something like timegm() to convert from struct tm to time_t
 				 ***/
 /*** TO BE DONE 5.0 START ***/
-printf("\nda rivedere qui:\n>>>>> ");
-	//  vers ginger
+
+	// trial
 	// if (stat(filename, stat_p)) //All'interno di stat_p verranno messe le informazioni relative al file con come filename
 	// 	fail_errno("stat");
 	// if(stat_p->st_mtime > my_timegm(&since_tm)) //Confronto le date dei due file per vedere se è stato modificato oppure no
 	// 	http_method = METHOD_NOT_CHANGED;
 
-	if(difftime(my_timegm(&since_tm), stat_p->st_mtime) == 0)
+	if(my_timegm(&since_tm) > stat_p->st_mtime)
         http_method = METHOD_NOT_CHANGED;
-    else
-		http_method -= METHOD_CONDITIONAL;
+    // else
+	// 	http_method -= METHOD_CONDITIONAL;
 
 /*** TO BE DONE 5.0 END ***/
 
