@@ -370,19 +370,40 @@ void manage_http_requests(int client_fd
 			    if ( strcmp(option_name, "Cookie") == 0 ) {
                                 /*** parse the cookie in order to get the UserID and count the number of requests coming from this client ***/
 /*** TO BE DONE 5.0 START ***/
-printf("\ndebug start...");
+printf("\ndebug start...\n\n");
+
+char test[80], blah[80];
+char *sep = "\\/:;=-";
+char *word, *phrase, *brkt, *brkb;
+
+strcpy(test, "This;is.a:test:of=the/string\\tokenizer-function.");
+
+for (word = strtok_r(test, sep, &brkt);
+	word;
+	word = strtok_r(NULL, sep, &brkt))
+{
+	strcpy(blah, "blah:blat:blab:blag");
+
+	for (phrase = strtok_r(blah, sep, &brkb);
+		phrase;
+		phrase = strtok_r(NULL, sep, &brkb))
+	{
+		printf("So far we're at %s:%s\n", word, phrase);
+	}
+}
+
 	//  vers ginger
 	// ++strtokr_save; //Togliamo i ':' dalla stringa
-	// option_val = strtok_r(NULL, " \r", &strtokr_save);
+	// option_val = strtok_r(NULL, "\r", &strtokr_save);
 	// sscanf(option_val, "%d", &UIDcookie);
 
 	char *iduser = "UserID=";
-    option_val = strtok_r(NULL, "\r\n", &strtokr_save); // '\r' è il rtorno a capo
+    option_val = strtok_r(NULL, "\r", &strtokr_save); // '\r' è il ritorno a capo e il separatore
+
     while(option_val != NULL && *option_val == ' ') // se non sono arrivato in fondo e il carattere a cui sto puntando è ' '
         option_val++; // rimuovo gli spazi vuoti
 
-    if(option_val != NULL && !strncmp(option_val, iduser, strlen(iduser)))
-		sscanf(option_val + strlen(iduser), "%d", &UIDcookie);
+    sscanf(option_val, "%d", &UIDcookie);
 
 	printf("%s --- %s", strtokr_save, option_val); // test
 
