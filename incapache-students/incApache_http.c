@@ -217,7 +217,7 @@ printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-----------------------------------------
 	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
 	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	// printf("%d", now_tm.tm_year); // test
-	snprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; %s;", cookie, COOKIE_EXPIRE); // ok
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; %s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
 
