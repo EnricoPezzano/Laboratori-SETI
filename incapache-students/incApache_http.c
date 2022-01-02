@@ -213,7 +213,7 @@ void send_response(int client_fd, int response_code, int cookie,
         if ( cookie >= 0 ) {
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
-
+printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-----------------------------------------------\n");
 	now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	// printf("%d", now_tm.tm_year); // test
@@ -396,9 +396,10 @@ void manage_http_requests(int client_fd
 //     option_val++; // rimuovo gli spazi vuoti
 // sscanf(option_val, "%d", &UIDcookie);
 
-	UIDcookie = atoi(strtok_r(NULL, " \n\r=", &strtokr_save)); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	printf("\nUserID Cookie=%d\n", UIDcookie); // debug("UserID Cookie=%d\n", UIDcookie);
-	// come faccio a contare il numero di richieste in arrivo dal client?
+	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
+	UIDcookie = atoi(strtokr_save);
+	printf("UserID Cookie=%d\n", UIDcookie); // debug("UserID Cookie=%d\n", UIDcookie);
+	// client provided UID Cookie 0 for the 4 time (stampa a terminale di test)
 
 	// check test
 	// printf("%s --- %s", strtokr_save, option_val); 
