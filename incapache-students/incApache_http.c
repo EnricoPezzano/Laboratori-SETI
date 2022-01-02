@@ -65,12 +65,14 @@ int get_new_UID(void)
      *** Be careful in order to avoid race conditions ***/
 /*** TO BE DONE 5.0 START ***/
 
-	pthread_mutex_lock(&cookie_mutex);
+	if(pthread_mutex_lock(&cookie_mutex) != 0)
+		fail_errno("cannot lock shared resource");
 	CurUID++;
 	retval = CurUID % MAX_COOKIES;
 	UserTracker[retval] = 0;
-	CurUID = retval;
-	pthread_mutex_unlock(&cookie_mutex);
+	// CurUID = retval;
+	if(pthread_mutex_unlock(&cookie_mutex) != 0)
+		fail_errno("cannot unlock shared resource");
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -88,10 +90,14 @@ int keep_track_of_UID(int myUID)
      *** Be careful in order to avoid race conditions ***/
 /*** TO BE DONE 5.0 START ***/
 
-	pthread_mutex_lock(&cookie_mutex);
+	if(pthread_mutex_lock(&cookie_mutex) != 0)
+		fail_errno("cannot lock sharde resource");
+		
 	UserTracker[myUID]++;
 	newcount = UserTracker[myUID];
-	pthread_mutex_unlock(&cookie_mutex);
+
+	if(pthread_mutex_unlock(&cookie_mutex) != 0)
+		fail_errno("cannot unlock sharde resource");
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -123,8 +129,12 @@ void send_response(int client_fd, int response_code, int cookie,
 	/*** Compute date of servicing current HTTP Request using a variant of gmtime() ***/
 /*** TO BE DONE 5.0 START ***/
 
-	if(my_timegm(&now_tm) == -1) // ret = mktime(tm);
-		fail_errno("Cannot get the time");
+	// if(my_timegm(&now_tm) == -1) // ret = mktime(tm);
+	// 	fail_errno("Cannot get the time");
+
+	// vers gabri
+	if(gmtime_r(&now_t, &now_tm)==NULL)
+ 		fail_errno("http.c - send_response() - gmtime_r error");
 
 /*** TO BE DONE 5.0 END ***/
 
