@@ -185,10 +185,12 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	stat_p = &stat_buffer;
-	if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-		fail_errno("stat error(404)");
-	
+	if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
+		stat_p = &stat_buffer;
+		if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
+			fail_errno("stat error(404)");
+	}
+
 	file_size = stat_p->st_size;
 	mime_type = get_mime_type(HTML_404);
 	file_modification_time = stat_p->st_mtime;
@@ -204,12 +206,14 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_501 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	mime_type = my_strdup(HTML_mime);
-	stat_p = &stat_buffer;
-	if(stat(HTML_501, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-		fail_errno("stat error(501)");
-	
+	if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
+		stat_p = &stat_buffer;
+		if(stat(HTML_501, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
+			fail_errno("stat error(404)");
+	}
+
 	file_size = stat_p->st_size;
+	mime_type = get_mime_type(HTML_501);
 	file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
@@ -222,12 +226,16 @@ void send_response(int client_fd, int response_code, int cookie,
         if ( cookie >= 0 ) {
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
-printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-----------------------------------------------\n");
+
 	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
 	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	// printf("%d", now_tm.tm_year); // test
-	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // ok
-	printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-----------------------------------------------%s", time_as_string);
+
+	now_tm.tm_hour++;
+	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
+	sprintf(http_header + strlen(http_header),"\r\nSet-Cookie: UserID=%d; Expires=%s;", cookie, time_as_string);
+
+	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
 
