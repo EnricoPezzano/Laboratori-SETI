@@ -372,19 +372,20 @@ void manage_http_requests(int client_fd
 /*** TO BE DONE 5.0 START ***/
 printf("\ndebug start...");
 	//  vers ginger
-	// ++strtokr_save; //Togliamo i ':' dalla stringa
-	// option_val = strtok_r(NULL, " \r", &strtokr_save);
-	// sscanf(option_val, "%d", &UIDcookie);
-
-	char *iduser = "UserID=";
+	++strtokr_save; //Togliamo i ':' dalla stringa
+	option_val = strtok_r(NULL, " \r", &strtokr_save);
+	sscanf(option_val, "%d", &UIDcookie);
 	printf("%s --- %s", strtokr_save, option_val); // test
-    option_val = strtok_r(NULL, "\r\n", &strtokr_save); // '\r' è il rtorno a capo
-    printf("%s --- %s", strtokr_save, option_val); // test
-    while(option_val != NULL && *option_val == ' ') // se non sono arrivato in fondo e il carattere a cui sto puntando è ' '
-        option_val++; // rimuovo gli spazi vuoti
 
-    if(option_val != NULL && !strncmp(option_val, iduser, strlen(iduser)))
-		sscanf(option_val + strlen(iduser), "%d", &UIDcookie);
+	// char *iduser = "UserID=";
+	// printf("%s --- %s", strtokr_save, option_val); // test
+    // option_val = strtok_r(NULL, "\r\n", &strtokr_save); // '\r' è il rtorno a capo
+    // printf("%s --- %s", strtokr_save, option_val); // test
+    // while(option_val != NULL && *option_val == ' ') // se non sono arrivato in fondo e il carattere a cui sto puntando è ' '
+    //     option_val++; // rimuovo gli spazi vuoti
+
+    // if(option_val != NULL && !strncmp(option_val, iduser, strlen(iduser)))
+	// 	sscanf(option_val + strlen(iduser), "%d", &UIDcookie);
 
 printf("\ndebug end...");
 /*** TO BE DONE 5.0 END ***/
