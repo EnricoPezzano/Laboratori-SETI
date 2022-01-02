@@ -129,12 +129,11 @@ void send_response(int client_fd, int response_code, int cookie,
 	/*** Compute date of servicing current HTTP Request using a variant of gmtime() ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// if(my_timegm(&now_tm) == -1) // ret = mktime(tm);
+	// if(my_timegm(&now_tm) == -1) // ret = mktime(tm); non restituisce il time corretto
 	// 	fail_errno("Cannot get the time");
 
-	// vers gabri
-	if(gmtime_r(&now_t, &now_tm)==NULL)
- 		fail_errno("http.c - send_response() - gmtime_r error");
+	if(gmtime_r(&now_t, &now_tm) == NULL)
+ 		fail_errno("cannot get current time via gmtime_r");
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -186,12 +185,12 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	mime_type = my_strdup(HTML_mime);
-	stat_p = &stat_buffer;
-	if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-		fail_errno("stat error(404)");
+	// stat_p = &stat_buffer;
+	// if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
+	// 	fail_errno("stat error(404)");
 	
 	file_size = stat_p->st_size;
+	mime_type = get_mime_type(HTML_404);
 	file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/

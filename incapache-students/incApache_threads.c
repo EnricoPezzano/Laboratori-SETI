@@ -245,7 +245,7 @@ char *get_mime_type(char *filename)
 /*** TO BE DONE 5.0 START ***/
 
 	if(pthread_mutex_lock(&mime_mutex) != 0)
-		fail_errno("threads.c - get_mime_type() - cannot LOCK shared resource");
+		fail_errno("get_mime_type error: cannot LOCK shared resource");
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -259,7 +259,7 @@ char *get_mime_type(char *filename)
 /*** TO BE DONE 5.0 START ***/
 
 	if(pthread_mutex_unlock(&mime_mutex) != 0)
-		fail_errno("threads.c - get_mime_type() - cannot UNLOCK shared resource");
+		fail_errno("get_mime_type error: cannot UNLOCK shared resource");
 
 /*** TO BE DONE 5.0 END ***/
 
