@@ -253,7 +253,7 @@ void send_response(int client_fd, int response_code, int cookie,
 	// debug:
 	// non arriva qua dentro, c'è qualcosa di sbagliato nel resto del codice
 	// da fare confronto con quello mio dell'anno scorso
-	snprintf(http_header + strlen(http_header),sizeof(http_header),"\r\nSet-Cookie: client=%d; Expires=Wed, 08 Dec 2021 10:18:14 GMT+1", cookie);
+	// snprintf(http_header + strlen(http_header),sizeof(http_header),"\r\nSet-Cookie: client=%d; Expires=Wed, 08 Dec 2021 10:18:14 GMT+1", cookie);
 	
 	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d %s;", cookie, COOKIE_EXPIRE); // 2021
 
@@ -274,7 +274,7 @@ void send_response(int client_fd, int response_code, int cookie,
 
 	gmtime_r(&file_modification_time, &file_modification_tm); // saves the return value in a struct * tm (&file_modification_tm)
 	if(&file_modification_tm == NULL) //[...] or null pointer on error [...] (cppreference.com)
-			fail_errno("Could not get the time from gmtime_r()");
+		fail_errno("Could not get the time from gmtime_r()");
 
 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm); // salva le informazioni di &file_modification_tm dentro il buffer time_as_string
 			//(char *restrict s, size_t maxsize, const char *restrict format, const struct tm *restrict timeptr);
