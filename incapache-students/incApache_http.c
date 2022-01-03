@@ -229,11 +229,9 @@ void send_response(int client_fd, int response_code, int cookie,
 
 	// trial
 	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
-	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
+	// 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", COOKIE_EXPIRE);
 	// printf("%d", now_tm.tm_year); // test
 
-	now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", COOKIE_EXPIRE);
 	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d %s;", cookie, time_as_string); // ok
 
 /*** TO BE DONE 5.0 END ***/
