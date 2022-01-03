@@ -232,14 +232,7 @@ void send_response(int client_fd, int response_code, int cookie,
 	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	// printf("%d", now_tm.tm_year); // test
 
-	// snprintf(http_header + strlen(http_header), sizeof(http_header), "\r\nSet-Cookie: client=%d; Expires=Wed, 09 Jun 2021 10:18:14 GMT+1");
-
-// da finire
-	now_tm.tm_hour++;
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
-	sprintf(http_header + strlen(http_header),"\r\nSet-Cookie: UserID=%d; Expires=%s;", cookie, time_as_string);
-
-	sprintf(http_header + strlen(http_header), "\r\n>>>>>>>>>>>>>>>>>>Set-Cookie: id=%d %s;", cookie, COOKIE_EXPIRE); // ok
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d %s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -418,16 +411,8 @@ void manage_http_requests(int client_fd
 //     option_val++; // rimuovo gli spazi vuoti
 // sscanf(option_val, "%d", &UIDcookie);
 
-	// vers gabri
-	// char* aux = strtok_r(NULL, "=", &strtokr_save);
-	// option_val = strtok_r(NULL, " ", &strtokr_save);
-	// UIDcookie = atoi(option_val);
-
 	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
 	UIDcookie = atoi(strtokr_save);
-
-	// check test
-	// printf("%s --- %s", strtokr_save, option_val); 
 
 /*** TO BE DONE 5.0 END ***/
 
