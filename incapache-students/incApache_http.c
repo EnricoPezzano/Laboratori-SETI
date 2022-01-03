@@ -227,16 +227,19 @@ void send_response(int client_fd, int response_code, int cookie,
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
 
+	// trial
 	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
 	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	// printf("%d", now_tm.tm_year); // test
+
+	// snprintf(http_header + strlen(http_header), sizeof(http_header), "\r\nSet-Cookie: client=%d; Expires=Wed, 09 Jun 2021 10:18:14 GMT+1");
 
 // da finire
 	now_tm.tm_hour++;
 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 	sprintf(http_header + strlen(http_header),"\r\nSet-Cookie: UserID=%d; Expires=%s;", cookie, time_as_string);
 
-	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // ok
+	sprintf(http_header + strlen(http_header), "\r\n>>>>>>>>>>>>>>>>>>Set-Cookie: id=%d %s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
 
