@@ -185,15 +185,24 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
-		stat_p = &stat_buffer;
-		if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-			fail_errno("stat error(404)");
-	}
-
-	file_size = stat_p->st_size;
+	struct stat tmp;
 	mime_type = get_mime_type(HTML_404);
+	if(stat_p == NULL)
+		stat_p = &stat_buffer;
+	if(stat(HTML_404, stat_p) == -1)
+		fail_errno("Error in stat 404");
+	file_size = stat_p->st_size;
 	file_modification_time = stat_p->st_mtime;
+
+	// if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
+	// 	stat_p = &stat_buffer;
+	// 	if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
+	// 		fail_errno("stat error(404)");
+	// }
+
+	// file_size = stat_p->st_size;
+	// mime_type = get_mime_type(HTML_404);
+	// file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
