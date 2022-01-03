@@ -215,15 +215,24 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_501 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
-		stat_p = &stat_buffer;
-		if(stat(HTML_501, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-			fail_errno("stat error(404)");
-	}
+	// if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
+	// 	stat_p = &stat_buffer;
+	// 	if(stat(HTML_501, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
+	// 		fail_errno("stat error(404)");
+	// }
 
-	file_size = stat_p->st_size;
+	// file_size = stat_p->st_size;
+	// mime_type = get_mime_type(HTML_501);
+	// file_modification_time = stat_p->st_mtime;
+
+	struct stat tmp;
 	mime_type = get_mime_type(HTML_501);
-	file_modification_time = stat_p->st_mtime;
+	if(stat_p == NULL)
+		stat_p = &stat_buffer;
+	if(stat(HTML_501, stat_p) == -1)
+		fail_errno("Error: stat 501");
+	 file_size = stat_p->st_size;
+	 file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -426,8 +435,17 @@ void manage_http_requests(int client_fd
 //     option_val++; // rimuovo gli spazi vuoti
 // sscanf(option_val, "%d", &UIDcookie);
 
-	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	UIDcookie = atoi(strtokr_save);
+	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
+	// UIDcookie = atoi(strtokr_save);
+
+	char *iduser = "UserID=";
+	option_val = strtok_r(NULL, "\r\n", &strtokr_save);
+	//remove blank spaces
+	while(option_val != NULL && *option_val == ' ')
+			option_val++;
+
+	if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
+		sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -447,7 +465,7 @@ void manage_http_requests(int client_fd
 	// }
 
 	option_name = strtok(http_option_line, ": "); // option_line parsing and storing in option_name
-	// option_val = strtok_r(NULL, "GMT", &strtokr_save);
+	option_val = strtok_r(NULL, "GMT", &strtokr_save);
 
 	if(strcmp(option_name, "If-Modified-Since") == 0)
 		http_method += METHOD_CONDITIONAL;
