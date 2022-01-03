@@ -232,6 +232,7 @@ void send_response(int client_fd, int response_code, int cookie,
 	// 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", COOKIE_EXPIRE);
 	// printf("%d", now_tm.tm_year); // test
 
+	printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 	snprintf(http_header + strlen(http_header),sizeof(http_header),"\r\nSet-Cookie: client=%d; Expires=Wed, 08 Dec 2021 10:18:14 GMT+1", cookie);
 	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d %s;", cookie, time_as_string); // ok
 
