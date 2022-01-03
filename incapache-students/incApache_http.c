@@ -415,13 +415,13 @@ void manage_http_requests(int client_fd
 //     option_val++; // rimuovo gli spazi vuoti
 // sscanf(option_val, "%d", &UIDcookie);
 
-	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	// UIDcookie = atoi(strtokr_save);
-	// printf("UserID Cookie=%d\n", UIDcookie); // debug("UserID Cookie=%d\n", UIDcookie);
+	// vers gabri
+	// char* aux = strtok_r(NULL, "=", &strtokr_save);
+	// option_val = strtok_r(NULL, " ", &strtokr_save);
+	// UIDcookie = atoi(option_val);
 
-	char* aux = strtok_r(NULL, "=", &strtokr_save);
-	option_val = strtok_r(NULL, " ", &strtokr_save);
-	UIDcookie = atoi(option_val);
+	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
+	UIDcookie = atoi(strtokr_save);
 
 	// check test
 	// printf("%s --- %s", strtokr_save, option_val); 
@@ -440,10 +440,10 @@ void manage_http_requests(int client_fd
 	// 	http_method = METHOD_CONDITIONAL;
 	// 	++strtokr_save;
 	// 	option_val = strtok_r(NULL, " \r", &strtokr_save);
-	// 	strptime(option_val,"%a, %d %b %Y %H:%M:%S GMT",&since_tm);
+	// 	strptime(option_val,"%a, %d %b %Y %H:%M:%S GMT",&since_tm); // given a date return a broken-down time
 	// }
 
-	option_name = strtok_r(http_option_line, ": ", &strtokr_save); // option_line parsing and storing in option_name
+	option_name = strtok(http_option_line, ": "); // option_line parsing and storing in option_name
 	// option_val = strtok_r(NULL, "GMT", &strtokr_save);
 
 	if(strcmp(option_name, "If-Modified-Since") == 0)
@@ -509,8 +509,8 @@ void manage_http_requests(int client_fd
 
 	if(my_timegm(&since_tm) > stat_p->st_mtime)
         http_method = METHOD_NOT_CHANGED;
-    // else
-	// 	http_method -= METHOD_CONDITIONAL;
+    else
+		http_method = METHOD_CONDITIONAL;
 
 /*** TO BE DONE 5.0 END ***/
 
