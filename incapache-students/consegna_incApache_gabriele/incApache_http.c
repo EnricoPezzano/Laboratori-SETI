@@ -5,11 +5,11 @@
  * Programma sviluppato a supporto del laboratorio di
  * Sistemi di Elaborazione e Trasmissione del corso di laurea
  * in Informatica classe L-31 presso l'Universita` degli Studi di
- * Genova, per l'anno accademico 2021/2022.
+ * Genova, per l'anno accademico 2020/2021.
  *
  * Copyright (C) 2012-2014 by Giovanni Chiola <chiolag@acm.org>
  * Copyright (C) 2015-2016 by Giovanni Lagorio <giovanni.lagorio@unige.it>
- * Copyright (C) 2016-2021 by Giovanni Chiola <chiolag@acm.org>
+ * Copyright (C) 2016-2020 by Giovanni Chiola <chiolag@acm.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 /***
 #define DEBUG
 ***/
+#define DEBUG
 
-#define COOKIE_EXPIRE "; Expires=Wed, 31 Jul 2022 23:59:59 GMT"
 
 #include "incApache.h"
 
@@ -63,18 +63,19 @@ int get_new_UID(void)
     /*** Compute retval by incrementing CurUID mod MAX_COOKIES
      *** and reset UserTracker[retval] to 0.
      *** Be careful in order to avoid race conditions ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
+//blocco la risorsa condivisa prima di fare operazioni "pericolose"
+    if(pthread_mutex_lock(&cookie_mutex)!=0)
+    	fail_errno("http.c - get_new_UID() - can't LOCK shared resource");
 
-	if(pthread_mutex_lock(&cookie_mutex) != 0)
-		fail_errno("cannot lock shared resource");
-	CurUID++;
-	retval = CurUID % MAX_COOKIES;
-	UserTracker[retval] = 0;
-	// CurUID = retval;
-	if(pthread_mutex_unlock(&cookie_mutex) != 0)
-		fail_errno("cannot unlock shared resource");
+    CurUID = CurUID+1;
+    retval = CurUID%MAX_COOKIES;
+    UserTracker[retval] = 0;
+//rilascio la risorsa condivisa prima di fare operazioni "pericolose"
+    if(pthread_mutex_unlock(&cookie_mutex)!=0)
+    	fail_errno("http.c - get_new_UID() - can't UNLOCK shared resource"); 
 
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 END ***/
 
     return retval;
 }
@@ -88,25 +89,53 @@ int keep_track_of_UID(int myUID)
 
     /*** Increment UserTracker[myUID] and return the computed value.
      *** Be careful in order to avoid race conditions ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
+    if(pthread_mutex_lock(&cookie_mutex)!=0)
+    	fail_errno("http.c - keep_track_of_UID() - can't LOCK shared resource");
 
-	if(pthread_mutex_lock(&cookie_mutex) != 0)
-		fail_errno("cannot lock sharde resource");
-		
-	UserTracker[myUID]++;
-	newcount = UserTracker[myUID];
+    UserTracker[myUID]++;
+    newcount = UserTracker[myUID];
 
-	if(pthread_mutex_unlock(&cookie_mutex) != 0)
-		fail_errno("cannot unlock sharde resource");
+	if(pthread_mutex_unlock(&cookie_mutex)!=0)
+		fail_errno("http.c - keep_track_of_UID() - can't UNLOCK shared resource"); 
 
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 END ***/
 
     return newcount;
 }
 
+/* ########################################
+
+	   struct stat {
+               dev_t     st_dev;         // ID of device containing file 
+               ino_t     st_ino;         // Inode number 
+               mode_t    st_mode;        // File type and mode 
+               nlink_t   st_nlink;       // Number of hard links 
+               uid_t     st_uid;         // User ID of owner 
+               gid_t     st_gid;         // Group ID of owner 
+               dev_t     st_rdev;        // Device ID (if special file) 
+               off_t     st_size;        // Total size, in bytes 
+               blksize_t st_blksize;     // Block size for filesystem I/O 
+               blkcnt_t  st_blocks;      // Number of 512B blocks allocated 
+
+               /* Since Linux 2.6, the kernel supports nanosecond
+                  precision for the following timestamp fields.
+                  For the details before Linux 2.6, see NOTES. 
+
+               struct timespec st_atim;  /* Time of last access 
+               struct timespec st_mtim;  /* Time of last modification 
+               struct timespec st_ctim;  /* Time of last status change 
+
+           #define st_atime st_atim.tv_sec      // Backward compatibility 
+           #define st_mtime st_mtim.tv_sec
+           #define st_ctime st_ctim.tv_sec
+           };
+
+####################################### */ 
+
 
 void send_response(int client_fd, int response_code, int cookie,
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 		   int is_http1_0, int thread_no,
 #endif
 		   char *filename, struct stat *stat_p)
@@ -127,22 +156,18 @@ void send_response(int client_fd, int response_code, int cookie,
 	debug("  ... start send_response(response_code=%d, filename=%s)\n", response_code, filename);
 
 	/*** Compute date of servicing current HTTP Request using a variant of gmtime() ***/
-/*** TO BE DONE 5.0 START ***/
-
-	// if(my_timegm(&now_tm) == -1) // ret = mktime(tm); non restituisce il time corretto
-	// 	fail_errno("Cannot get the time");
-
-	if(gmtime_r(&now_t, &now_tm) == NULL)
- 		fail_errno("cannot get current time via gmtime_r");
-
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 START ***/
+	if(gmtime_r(&now_t, &now_tm)==NULL)
+ 		fail_errno("http.c - send_response() - gmtime_r error");
+ 
+/*** TO BE DONE 3.0 END ***/
 
 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 	strcat(http_header, is_http1_0 ? "0 " : "1 ");
-#else /* #ifdef INCaPACHE_5_1 */
+#else /* #ifdef INCaPACHE_3_1 */
 	strcat(http_header, "0 ");
-#endif /* #ifdef INCaPACHE_5_1 */
+#endif /* #ifdef INCaPACHE_3_1 */
 	switch (response_code) {
 	case RESPONSE_CODE_OK:
 		strcat(http_header, "200 OK");
@@ -162,12 +187,12 @@ void send_response(int client_fd, int response_code, int cookie,
 			}
 
 			/*** compute file_size and file_modification_time ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
 
-	file_size = stat_p->st_size;
-    file_modification_time = stat_p->st_mtime;
+			file_size = stat_p->st_size;
+			file_modification_time = stat_p->st_mtime;
 
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 END ***/
 
 			debug("      ... send_response(%3d,%s) : file opened, size=%lu, mime=%s\n", response_code, filename, (unsigned long)file_size, mime_type);
 		}
@@ -183,19 +208,21 @@ void send_response(int client_fd, int response_code, int cookie,
 		if ((fd = open(HTML_404, O_RDONLY)) >= 0) {
 
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
+			if (stat_p == NULL)
+			{
+				stat_p = &stat_buffer;
+				if (stat(HTML_404, stat_p))
+					fail_errno("http.c - send_response() - stat error for HTML_404");
+			}
 
-	if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
-		stat_p = &stat_buffer;
-		if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-			fail_errno("stat error(404)");
-	}
+			file_size = stat_p->st_size;
+			
+			mime_type = get_mime_type(HTML_404);
 
-	file_size = stat_p->st_size;
-	mime_type = get_mime_type(HTML_404);
-	file_modification_time = stat_p->st_mtime;
+			file_modification_time = stat_p->st_mtime;
 
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 END ***/
 
 		}
 		break;
@@ -204,19 +231,20 @@ void send_response(int client_fd, int response_code, int cookie,
 		if ((fd = open(HTML_501, O_RDONLY)) >= 0) {
 
 			/*** compute file_size, mime_type, and file_modification_time of HTML_501 ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
+			if (stat_p == NULL) {
+				stat_p = &stat_buffer;
+				if (stat(HTML_501, stat_p))
+					fail_errno("http.c - send_response() - stat error for HTML_501");
+			}
 
-	if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
-		stat_p = &stat_buffer;
-		if(stat(HTML_501, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-			fail_errno("stat error(404)");
-	}
+			file_size = stat_p->st_size;
+			
+			mime_type = get_mime_type(HTML_501);
 
-	file_size = stat_p->st_size;
-	mime_type = get_mime_type(HTML_501);
-	file_modification_time = stat_p->st_mtime;
+			file_modification_time = stat_p->st_mtime;
 
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 END ***/
 
 		}
 		break;
@@ -225,26 +253,24 @@ void send_response(int client_fd, int response_code, int cookie,
 	strcat(http_header, time_as_string);
         if ( cookie >= 0 ) {
             /*** set permanent cookie in order to identify this client ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
+// Instead of expiring when the client closes, permanent cookies 
+//expire at a specific date (Expires) or after a specific length of time (Max-Age).
+//es: Set-Cookie: UserID=12a; Expires=Wed, 25 Dec 2019 15:46:00 GMT
 
-	// trial
-	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
-	// 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", COOKIE_EXPIRE);
-	// printf("%d", now_tm.tm_year); // test
+//1) imposto Expiration Date a 1 ora da creazione ("now_t")
+        	now_tm.tm_hour++;
+//2) creao stringa da inviare contenente la Expiration date
+        	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
 
-	printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-	// debug:
-	// non arriva qua dentro, c'è qualcosa di sbagliato nel resto del codice
-	// da fare confronto con quello mio dell'anno scorso
-	snprintf(http_header + strlen(http_header),sizeof(http_header),"\r\nSet-Cookie: client=%d; Expires=Wed, 08 Dec 2021 10:18:14 GMT+1", cookie);
-	
-	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d %s;", cookie, time_as_string); // 2021
+//3) concat cookies with sprintf to use format characters and add integers
+        	sprintf(http_header + strlen(http_header),"\r\nSet-Cookie: UserID=%d; Expires=%s;", cookie, time_as_string);
 
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 END ***/
 
         }
-	strcat(http_header, "\r\nServer: incApache for SETI.\r\n");
-#ifdef INCaPACHE_5_1
+	strcat(http_header, "\r\nServer: incApache for SET.\r\n");
+#ifdef INCaPACHE_3_1
 	if (response_code == 501 || is_http1_0)
 #endif
 		strcat(http_header, "Connection: close\r\n");
@@ -253,16 +279,14 @@ void send_response(int client_fd, int response_code, int cookie,
 
 		/*** compute time_as_string, corresponding to file_modification_time, in GMT standard format;
 		     see gmtime and strftime ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
 
-	gmtime_r(&file_modification_time, &file_modification_tm); // saves the return value in a struct * tm (&file_modification_tm)
-	if(&file_modification_tm == NULL) //[...] or null pointer on error [...] (cppreference.com)
-			fail_errno("Could not get the time from gmtime_r()");
+		if (gmtime_r(&file_modification_time, &file_modification_tm) == NULL)
+			fail_errno("http.c - send_response() - gmtime_r error while creating modification date");
 
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm); // salva le informazioni di &file_modification_tm dentro il buffer time_as_string
-			//(char *restrict s, size_t maxsize, const char *restrict format, const struct tm *restrict timeptr);
+		strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &file_modification_tm);
 
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 END ***/
 
 		strcat(http_header, time_as_string);
 		strcat(http_header, "\r\n");
@@ -271,7 +295,7 @@ void send_response(int client_fd, int response_code, int cookie,
 	debug("      ... send_response(%d, %s) : header prepared\n", response_code, filename);
 	printf("Sending the following response:\n%s\n",http_header);
 	header_size = strlen(http_header);
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 	join_prev_thread(thread_no);
 #endif
 #ifdef OptimizeTCP
@@ -290,12 +314,31 @@ void send_response(int client_fd, int response_code, int cookie,
 	if (fd >= 0) {
 
 		/*** send fd file on client_fd, then close fd; see syscall sendfile  ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
+	// The function returns the number of bytes written or -1 if an error occurred
+	// fd --> open for reading
+	// client_fd = open for writing
+	// file_size = dimensione del file. same as stat_p -> st_size
 
-	if (sendfile(client_fd, fd, NULL, file_size) == -1) //da studiare sul man
-		fail_errno("cannot send fd file on client_fd");
+	/*	header_sent = 0;
+		size_t offset = 0;
 
-/*** TO BE DONE 5.0 END ***/
+		for(offset = 0; 
+			offset + ( header_sent = sendfile(client_fd, fd, NULL, file_size) ) < file_size;
+			offset = offset + header_sent)
+		{
+			if (header_sent < 0)
+				fail_errno("http.c - send_response() - header_sent < 0 in sendfile()");
+		}
+		
+		close(fd);
+	*/
+
+		if (sendfile(client_fd, fd, NULL, file_size)<0)
+					fail_errno("http.c - send_response() - sendfile() error");
+
+		close(fd);
+/*** TO BE DONE 3.0 END ***/
 
 	}
 #ifdef OptimizeTCP
@@ -311,7 +354,7 @@ void send_response(int client_fd, int response_code, int cookie,
 
 
 void manage_http_requests(int client_fd
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 		, int connection_no
 #endif
 )
@@ -330,7 +373,7 @@ void manage_http_requests(int client_fd
 	struct tm since_tm;
 	struct stat *stat_p;
         int UIDcookie = -1;
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 	int is_http1_0 = 0;
 	int thread_idx;
 #endif
@@ -343,20 +386,19 @@ void manage_http_requests(int client_fd
 		printf("\n-----------------------------------------------\n");
 		printf("Received the following request:\n");
 		printf("%s", http_request_line);
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 		thread_idx = find_unused_thread_idx(connection_no);
 #endif
 
 		/*** parse first line defining the 3 strings method_str,
 		 *** filename, and protocol ***/
-/*** TO BE DONE 5.0 START ***/
-
-	//divido la stringa in 3 parti (ripassa sul man)
-    method_str = strtok_r(http_request_line, " ", &strtokr_save);
-    filename = strtok_r(NULL, " ", &strtokr_save);
-    protocol = strtok_r(NULL, "\r\n", &strtokr_save);
-
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 START ***/
+	// GET 			/dir 		HTTP/1.1
+	// method_str	filename 	protocol
+     	method_str = strtok_r(http_request_line, " ", &strtokr_save);
+		filename = strtok_r(NULL, " ", &strtokr_save);
+		protocol = strtok_r(NULL, "\n\r", &strtokr_save);
+/*** TO BE DONE 3.0 END ***/
 
 		debug("   ... method_str=%s, filename=%s (0=%c), protocol=%s (len=%d)\n",
 		      method_str, filename, filename ? filename[0] : '?', protocol, (int)(protocol ? strlen(protocol) : 0));
@@ -365,14 +407,14 @@ void manage_http_requests(int client_fd
 		    strlen(protocol) != 8) {
 			debug("       ... Bad Request!\n");
 			SEND_RESPONSE(client_fd, RESPONSE_CODE_BAD_REQUEST, UIDcookie,
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 				      1, connection_no, thread_idx,
 #endif
 				      NULL, NULL);
 			free(http_request_line);
 			break;
 		}
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 		is_http1_0 = !strcmp(protocol, "HTTP/1.0");
 #endif
 		memset(&since_tm, 0, sizeof(since_tm));
@@ -390,60 +432,29 @@ void manage_http_requests(int client_fd
 			if ( option_name != NULL ) {
 			    if ( strcmp(option_name, "Cookie") == 0 ) {
                                 /*** parse the cookie in order to get the UserID and count the number of requests coming from this client ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
+			    	//devo ottenere UIDcookie da richiesta del browser
+			    	//strtokr_r()
+			    	char* aux = strtok_r(NULL, "=", &strtokr_save);
+			    	//aux == 'UserID'
+			    	option_val = strtok_r(NULL, " ", &strtokr_save);
+            		UIDcookie = atoi(option_val);
 
-	// man strtok_r example :)
-// char test[80], blah[80];
-// char *sep = "\\/:;=-";
-// char *word, *phrase, *brkt, *brkb;
-// strcpy(test, "This;is.a:test:of=the/string\\tokenizer-function.");
-// for (word = strtok_r(test, sep, &brkt);
-// 	word;
-// 	word = strtok_r(NULL, sep, &brkt))
-// {
-// 	strcpy(blah, "blah:blat:blab:blag");
-// 	for (phrase = strtok_r(blah, sep, &brkb);
-// 		phrase;
-// 		phrase = strtok_r(NULL, sep, &brkb))
-// 	{
-// 		printf("So far we're at %s:%s\n", word, phrase);
-// 	}
-// }
-
-// trial
-// char *iduser = "UserID=";
-// option_val =  
-// while(option_val != NULL && *option_val == ' ') // se non sono arrivato in fondo e il carattere a cui sto puntando è ' '
-//     option_val++; // rimuovo gli spazi vuoti
-// sscanf(option_val, "%d", &UIDcookie);
-
-	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	UIDcookie = atoi(strtokr_save);
-
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 END ***/
 
                             }
 			    if (!MethodIsConditional(http_method)) {
 
 				/*** parse option line, recognize "If-Modified-Since" option,
 				 *** and possibly add METHOD_CONDITIONAL flag to http_method
-/*** TO BE DONE 5.0 START ***/
-
-	// trial
-	// if( strcmp(option_name, "If-Modified-Since") == 0 ){
-	// 	http_method = METHOD_CONDITIONAL;
-	// 	++strtokr_save;
-	// 	option_val = strtok_r(NULL, " \r", &strtokr_save);
-	// 	strptime(option_val,"%a, %d %b %Y %H:%M:%S GMT",&since_tm); // given a date return a broken-down time
-	// }
-
-	option_name = strtok(http_option_line, ": "); // option_line parsing and storing in option_name
-	// option_val = strtok_r(NULL, "GMT", &strtokr_save);
-
-	if(strcmp(option_name, "If-Modified-Since") == 0)
-		http_method += METHOD_CONDITIONAL;
-
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 START ***/
+			    //strptime() /* given a date return a broken-down time */
+			    	if (strcmp(option_name, "If-Modified-Since") == 0)
+			    	{
+						strptime(strtokr_save, " %a, %d %b %Y %T GMT", &since_tm);
+	            		http_method = METHOD_CONDITIONAL;
+	          		}
+/*** TO BE DONE 3.0 END ***/
 
 			    }
                         }
@@ -465,7 +476,7 @@ void manage_http_requests(int client_fd
 		if (http_method == METHOD_NONE) {
 			printf("method not implemented\n");
 			SEND_RESPONSE(client_fd, 501, UIDcookie,
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 				      1, connection_no, thread_idx,
 #endif
 				      method_str, NULL);
@@ -482,7 +493,7 @@ void manage_http_requests(int client_fd
 			debug("    ... file %s not found!\n", filename);
 			free(stat_p);
 			SEND_RESPONSE(client_fd, RESPONSE_CODE_NOT_FOUND, UIDcookie,
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 				      is_http1_0, connection_no, thread_idx,
 #endif
 				      filename, NULL);
@@ -493,20 +504,13 @@ void manage_http_requests(int client_fd
 				 *** whether to transform http_method to METHOD_NOT_CHANGED
 				 *** Use something like timegm() to convert from struct tm to time_t
 				 ***/
-/*** TO BE DONE 5.0 START ***/
+/*** TO BE DONE 3.0 START ***/
+				if(my_timegm(&since_tm) < (stat_p->st_mtime))
+					http_method = METHOD_GET;
+				else 
+            		http_method=METHOD_NOT_CHANGED;
 
-	// trial
-	// if (stat(filename, stat_p)) //All'interno di stat_p verranno messe le informazioni relative al file con come filename
-	// 	fail_errno("stat");
-	// if(stat_p->st_mtime > my_timegm(&since_tm)) //Confronto le date dei due file per vedere se è stato modificato oppure no
-	// 	http_method = METHOD_NOT_CHANGED;
-
-	if(my_timegm(&since_tm) > stat_p->st_mtime)
-        http_method = METHOD_NOT_CHANGED;
-    else
-		http_method = METHOD_CONDITIONAL;
-
-/*** TO BE DONE 5.0 END ***/
+/*** TO BE DONE 3.0 END ***/
 
 			}
 			switch (http_method) {
@@ -514,7 +518,7 @@ void manage_http_requests(int client_fd
 				debug("    ... sending header for file %s\n", filename);
 				free(stat_p);
 				SEND_RESPONSE(client_fd, RESPONSE_CODE_OK, UIDcookie, /*** OK, without body ***/
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 					      is_http1_0, connection_no, thread_idx,
 #endif
 					      filename, NULL);
@@ -523,7 +527,7 @@ void manage_http_requests(int client_fd
 				debug("    ... file %s not modified\n", filename);
 				free(stat_p);
 				SEND_RESPONSE(client_fd, RESPONSE_CODE_NOT_MODIFIED, UIDcookie, /*** Not Modified, without body ***/
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 					      is_http1_0, connection_no, thread_idx,
 #endif
 					      NULL, NULL);
@@ -531,21 +535,23 @@ void manage_http_requests(int client_fd
 			case METHOD_GET :
 				debug("    ... sending file %s\n", filename);
 				SEND_RESPONSE(client_fd, RESPONSE_CODE_OK, UIDcookie, /*** OK, with body ***/
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 					      is_http1_0, connection_no, thread_idx,
 #endif
 					      filename, stat_p);
 				break;
 			default:
+				printf("Mi blocco qui sometimes because i have no idea." 
+					"( assert(0) fa parte del codice originale )\n");
 				assert(0);
 			}
 		}
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 		if (is_http1_0)
 #endif
 			break;
 	}
-#ifdef INCaPACHE_5_1
+#ifdef INCaPACHE_3_1
 	join_all_threads(connection_no);
 #endif
 	if (close(client_fd))
