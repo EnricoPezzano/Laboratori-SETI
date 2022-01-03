@@ -1,4 +1,4 @@
-/* 
+/*
  * incApache_aux.c: funzioni ausiliarie per il web server
  *
  * Programma sviluppato a supporto del laboratorio di
@@ -52,19 +52,28 @@ static pthread_mutex_t my_timegm_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 time_t my_timegm(struct tm *tm)
 {
-	time_t ret;
+               time_t ret;
+               char *tz;
 
-/*** TO BE DONE 3.0 START ***/
-    //blocco la risorsa condivisa prima di fare operazioni "pericolose"
-    pthread_mutex_lock (&my_timegm_mutex);
-    
-    //call timegm() 
-    ret = timegm(tm);
-    if(ret==-1)
-    	fail_errno("my_timgm error ");
+        /*** Guess what is missing here ... ***/
+/*** TO BE DONE 4.0 START ***/
+	pthread_mutex_lock(&my_timegm_mutex);
+/*** TO BE DONE 4.0 END ***/
 
-    pthread_mutex_unlock (&my_timegm_mutex);
-/*** TO BE DONE 3.0 END ***/
+               setenv("TZ", "", 1);
+               tzset();
+               ret = mktime(tm);
+               if (tz) {
+                   setenv("TZ", tz, 1);
+                   free(tz);
+               } else
+                   unsetenv("TZ");
 
-    return ret;
+        /*** Guess what is missing here ... ***/
+/*** TO BE DONE 4.0 START ***/
+	tzset();
+	pthread_mutex_unlock(&my_timegm_mutex);
+/*** TO BE DONE 4.0 END ***/
+
+               return ret;
 }

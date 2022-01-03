@@ -1,4 +1,4 @@
-/* 
+/*
  * incApache_main.c: implementazione del main per il web server del corso di SET
  *
  * Programma sviluppato a supporto del laboratorio di
@@ -73,25 +73,19 @@ void run_webserver(const char *const port_as_str, char *www_root, const int *con
 
 	/*** perform chroot to www_root; then, create, bind, and listen to
 	 *** listen_fd, and eventually drop root privileges ***/
-/*** TO BE DONE 3.0 START ***/
-
-	// call chroot whit sudo permission 
-	if(chroot(www_root)==-1)
-		fail_errno("chroot() error ");
+/*** TO BE DONE 4.0 START ***/
+	if(chroot(www_root) == -1)
+		 fail_errno("Error: chroot() has failed.");
 
 	create_listening_socket(port_as_str);
+	drop_privileges();
+/*** TO BE DONE 4.0 END ***/
 
-	//	restore User ID!!
-	if(geteuid()==0)
-		drop_privileges();
-
-/*** TO BE DONE 3.0 END ***/
-
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 	printf("Server HTTP 1.1 (with pipelining support)");
-#else /* #ifdef INCaPACHE_3_1 */
+#else /* #ifdef INCaPACHE_4_1 */
 	printf("Server HTTP 1.0");
-#endif /* #ifdef INCaPACHE_3_1 */
+#endif /* #ifdef INCaPACHE_4_1 */
 	printf(" listening on port %s\nwith WWW root set to %s\n\n", port_as_str, www_root);
 	free(www_root);
 	mime_request_stream = fdopen(p_to_file[1], "w");
@@ -104,24 +98,21 @@ void run_webserver(const char *const port_as_str, char *www_root, const int *con
 		fail_errno("Cannot create MIME reply stream");
 	if (close(p_from_file[1]))
 		fail_errno("Cannot close p_from_file write-end");
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 	for (i = MAX_CONNECTIONS; i < MAX_THREADS; i++)
 		connection_no[i] = FREE_SLOT;
-#endif /* #ifdef INCaPACHE_3_1 */
+#endif /* #ifdef INCaPACHE_4_1 */
 	for (i = 0; i < MAX_CONNECTIONS; i++) {
 		connection_no[i] = i;
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 		no_response_threads[i] = 0;
-#endif /* #ifdef INCaPACHE_3_1 */
+#endif /* #ifdef INCaPACHE_4_1 */
 
 		/*** create PTHREAD number i, running client_connection_thread() ***/
-/*** TO BE DONE 3.0 START ***/
-		//pthread_create return 0 on success, num on fail
-		// !! client_connection_thread() to be done for HTTP 1.1 (in file threads.c)
-		if(pthread_create(&thread_ids[i], NULL, client_connection_thread, &connection_no[i]  )!=0)
-			fail_errno("main.c - run_web_server() - pthread error");
-
-/*** TO BE DONE 3.0 END ***/
+/*** TO BE DONE 4.0 START ***/
+	if(pthread_create(&thread_ids[i],NULL,client_connection_thread,&connection_no[i]) != 0)
+		fail_errno("Error: pthread_create() has failed.");
+/*** TO BE DONE 4.0 END ***/
 
 	}
 	for (i = 0; i < MAX_CONNECTIONS; i++)
@@ -185,4 +176,3 @@ int main(int argc, char **argv)
 	run_webserver(port_as_str, www_root, p_to_file, p_from_file);
 	return EXIT_SUCCESS;
 }
-

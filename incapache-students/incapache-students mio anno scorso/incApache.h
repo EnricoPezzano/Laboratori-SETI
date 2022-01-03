@@ -15,7 +15,7 @@
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  */
- 
+
 #ifndef incApache_h
 #define incApache_h
 
@@ -53,7 +53,7 @@
 #define MAX_CONNECTIONS 8
 #define MAX_COOKIES 256
 
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 
 #define FREE_SLOT (-1)
 #define RESERVED_SLOT (-2)
@@ -81,11 +81,11 @@ extern void send_resp_thread(int out_socket, int response_code, int cookie,
 			     int is_http1_0, int connection_idx, int new_thread_idx,
 			     char *filename, struct stat *stat_p);
 
-#else /* #ifdef INCaPACHE_3_1 */
+#else /* #ifdef INCaPACHE_4_1 */
 
 #define SEND_RESPONSE send_response
 
-#endif /* #ifdef INCaPACHE_3_1 */
+#endif /* #ifdef INCaPACHE_4_1 */
 
 #define MAX_TIME_STR 40
 #define MAX_HEADER_SIZE 10000
@@ -110,12 +110,12 @@ void fail_errno(const char *const msg);
 extern void *client_connection_thread(void *vp);
 extern char *get_mime_type(char *filename);
 extern void send_response(int client_fd, int response_code, int cookie,
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 			  int is_http1_0, int thread_no,
 #endif
 			  char *filename, struct stat *stat_p);
 extern void manage_http_requests(int client_fd
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 		, int connection_no
 #endif
 );

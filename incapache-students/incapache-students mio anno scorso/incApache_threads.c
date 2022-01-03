@@ -1,4 +1,4 @@
-/* 
+/*
  * incApache_threads.c: implementazione dei thread per il web server del corso di SET
  *
  * Programma sviluppato a supporto del laboratorio di
@@ -21,7 +21,7 @@
 pthread_mutex_t accept_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mime_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 int client_sockets[MAX_CONNECTIONS]; /* for each connection, its socket FD */
 int no_response_threads[MAX_CONNECTIONS]; /* for each connection, how many response threads */
 
@@ -76,20 +76,10 @@ void join_all_threads(int conn_no)
 	 *** call pthread_join() on thread_ids[i], and update shared variables
 	 *** no_free_threads, no_response_threads[conn_no], and
 	 *** connection_no[i] ***/
-/*** TO BE DONE 3.1 START ***/
-	//compute index i of the thread to join 
-	i = to_join[conn_no];
-	if(pthread_join(thread_ids[i], NULL) != 0)
-		fail_errno("threads.c - join_all_threads() - pthread_join() error");
-	
-	//update shared variables
-	pthread_mutex_lock(&threads_mutex);
-	no_free_threads++;	
-	no_response_threads[conn_no]--;
-	connection_no[i] = FREE_SLOT ;
-	pthread_mutex_unlock(&threads_mutex);
+/*** TO BE DONE 4.1 START ***/
 
-/*** TO BE DONE 3.1 END ***/
+
+/*** TO BE DONE 4.1 END ***/
 
 }
 
@@ -105,23 +95,10 @@ void join_prev_thread(int thrd_no)
 	 *** wait for its termination, and update the shared variables
 	 *** no_free_threads, no_response_threads[conn_no], and connection_no[i],
 	 *** avoiding race conditions ***/
-/*** TO BE DONE 3.1 START ***/
-	if(to_join[thrd_no] == NULL)
-		return;
-
-	i = to_join[thrd_no];
-	if(pthread_join(thread_ids[i], NULL) != 0)
-		fail_errno("threads.c - join_all_threads() - pthread_join() error");
-	
-	//update shared variables
-	pthread_mutex_lock(&threads_mutex);
-	no_free_threads++;	
-	no_response_threads[conn_no]--;
-	connection_no[i] = FREE_SLOT ;
-	pthread_mutex_unlock(&threads_mutex);
+/*** TO BE DONE 4.1 START ***/
 
 
-/*** TO BE DONE 3.1 END ***/
+/*** TO BE DONE 4.1 END ***/
 
 }
 
@@ -144,12 +121,12 @@ void *response_thread(void *vp)
 	return NULL;
 }
 
-#else /* #ifndef INCaPACHE_3_1 */
+#else /* #ifndef INCaPACHE_4_1 */
 
 pthread_t thread_ids[MAX_CONNECTIONS];
 int connection_no[MAX_CONNECTIONS];
 
-#endif /* ifdef INCaPACHE_3_1 */
+#endif /* ifdef INCaPACHE_4_1 */
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -158,15 +135,15 @@ void *client_connection_thread(void *vp)
 	int client_fd;
 	struct sockaddr_storage client_addr;
 	socklen_t addr_size;
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 	pthread_mutex_lock(&threads_mutex);
 	int connection_no = *((int *) vp);
 
 	/*** properly initialize the thread queue to_join ***/
-/*** TO BE DONE 3.1 START ***/
+/*** TO BE DONE 4.1 START ***/
 
-	to_join[connection_no] = NULL;
-/*** TO BE DONE 3.1 END ***/
+
+/*** TO BE DONE 4.1 END ***/
 
 	pthread_mutex_unlock(&threads_mutex);
 #endif
@@ -176,14 +153,14 @@ void *client_connection_thread(void *vp)
 		if ((client_fd = accept(listen_fd, (struct sockaddr *) &client_addr, &addr_size)) == -1)
 			fail_errno("Cannot accept client connection");
 		pthread_mutex_unlock(&accept_mutex);
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 		client_sockets[connection_no] = client_fd;
 #endif
 		char str[INET_ADDRSTRLEN];
 		struct sockaddr_in *ipv4 = (struct sockaddr_in *) &client_addr;
 		printf("Accepted connection from %s\n", inet_ntop(AF_INET, &(ipv4->sin_addr), str, INET_ADDRSTRLEN));
 		manage_http_requests(client_fd
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 				, connection_no
 #endif
 		);
@@ -203,11 +180,9 @@ char *get_mime_type(char *filename)
 	debug("      ... get_mime_type(%s): was not .css\n", filename);
 
 	/*** What is missing here to avoid race conditions ? ***/
-/*** TO BE DONE 3.0 START ***/
-	if(pthread_mutex_lock(&mime_mutex)!=0)
-    	fail_errno("threads.c - get_mime_type() - can't LOCK shared resource");
-
-/*** TO BE DONE 3.0 END ***/
+/*** TO BE DONE 4.0 START ***/
+	pthread_mutex_lock(&mime_mutex);
+/*** TO BE DONE 4.0 END ***/
 
 	fprintf(mime_request_stream, "%s\n", filename);
 	fflush(mime_request_stream);
@@ -216,11 +191,9 @@ char *get_mime_type(char *filename)
 		fail("Could not get answer from file");
 
 	/*** What is missing here to avoid race conditions ? ***/
-/*** TO BE DONE 3.0 START ***/
-	if(pthread_mutex_unlock(&mime_mutex)!=0)
-    	fail_errno("threads.c - get_mime_type() - can't UNLOCK shared resource");
-
-/*** TO BE DONE 3.0 END ***/
+/*** TO BE DONE 4.0 START ***/
+	pthread_mutex_unlock(&mime_mutex);
+/*** TO BE DONE 4.0 END ***/
 
 	if (mime_t[--nchars_read] == '\n')
 		mime_t[nchars_read] = '\0';
@@ -229,7 +202,7 @@ char *get_mime_type(char *filename)
 }
 
 
-#ifdef INCaPACHE_3_1
+#ifdef INCaPACHE_4_1
 
 void send_resp_thread(int out_socket, int response_code, int cookie,
 		      int is_http1_0, int connection_idx, int new_thread_idx,
@@ -247,10 +220,10 @@ void send_resp_thread(int out_socket, int response_code, int cookie,
 	debug(" ... send_resp_thread(): parameters set, conn_no=%d\n", connection_idx);
 
 	/*** enqueue the current thread in the "to_join" data structure ***/
-/*** TO BE DONE 3.1 START ***/
+/*** TO BE DONE 4.1 START ***/
 
 
-/*** TO BE DONE 3.1 END ***/
+/*** TO BE DONE 4.1 END ***/
 
 	if (pthread_create(thread_ids + new_thread_idx, NULL, response_thread, connection_no + new_thread_idx))
 		fail_errno("Could not create response thread");
