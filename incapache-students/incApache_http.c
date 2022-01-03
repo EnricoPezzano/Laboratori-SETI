@@ -250,13 +250,12 @@ void send_response(int client_fd, int response_code, int cookie,
 	// 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", COOKIE_EXPIRE);
 	// printf("%d", now_tm.tm_year); // test
 
-	printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 	// debug:
 	// non arriva qua dentro, c'è qualcosa di sbagliato nel resto del codice
 	// da fare confronto con quello mio dell'anno scorso
 	snprintf(http_header + strlen(http_header),sizeof(http_header),"\r\nSet-Cookie: client=%d; Expires=Wed, 08 Dec 2021 10:18:14 GMT+1", cookie);
 	
-	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d %s;", cookie, time_as_string); // 2021
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d %s;", cookie, COOKIE_EXPIRE); // 2021
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -528,7 +527,7 @@ void manage_http_requests(int client_fd
 	// if(stat_p->st_mtime > my_timegm(&since_tm)) //Confronto le date dei due file per vedere se è stato modificato oppure no
 	// 	http_method = METHOD_NOT_CHANGED;
 
-	if(my_timegm(&since_tm) > stat_p->st_mtime)
+	if(my_timegm(&since_tm) > stat_p->st_mtime) // if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0)
         http_method = METHOD_NOT_CHANGED;
     else
 		http_method = METHOD_CONDITIONAL;
