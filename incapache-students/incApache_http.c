@@ -434,18 +434,17 @@ void manage_http_requests(int client_fd
 //     option_val++; // rimuovo gli spazi vuoti
 // sscanf(option_val, "%d", &UIDcookie);
 
-	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	UIDcookie = atoi(strtokr_save);
-	// con questa versione c'è il conteggio delle richieste, manca da stampare la risposta "200 ok"
+	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
+	// UIDcookie = atoi(strtokr_save);
+	// // con questa versione c'è il conteggio delle richieste, manca da stampare la risposta "200 ok" che avviene solo con back to homepage
 
-	// char *iduser = "UserID=";
-	// option_val = strtok_r(NULL, "\r\n", &strtokr_save);
-	// //remove blank spaces
-	// while(option_val != NULL && *option_val == ' ')
-	// 		option_val++;
-
-	// if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
-	// 	sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
+	char *iduser = "UserID=";
+	option_val = strtok_r(NULL, "\r\n", &strtokr_save);
+	//remove blank spaces
+	while(option_val != NULL && *option_val == ' ')
+			option_val++;
+	if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
+		sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
 	// manca il conteggio del numero delle richieste...basta utilizzare il codice di sopra...?
 
 /*** TO BE DONE 5.0 END ***/

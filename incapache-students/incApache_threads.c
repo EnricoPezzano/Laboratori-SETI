@@ -105,7 +105,7 @@ pthread_mutex_t mime_mutex = PTHREAD_MUTEX_INITIALIZER;
 	no_free_threads++;	
 	no_response_threads[conn_no]--;
 	connection_no[i] = FREE_SLOT ;
-	pthread_mutex_unlock(&threads_mutex);
+	pthread_mutex_unlock(&threads_mutex); // non serve evitare la concorrenza
 
 /*** TO BE DONE 5.1 END ***/
 
