@@ -436,6 +436,7 @@ void manage_http_requests(int client_fd
 
 	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
 	UIDcookie = atoi(strtokr_save);
+	// con questa versione c'è il conteggio delle richieste, manca da stampare la risposta "200 ok"
 
 	// char *iduser = "UserID=";
 	// option_val = strtok_r(NULL, "\r\n", &strtokr_save);
