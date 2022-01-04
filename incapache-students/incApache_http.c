@@ -255,7 +255,7 @@ void send_response(int client_fd, int response_code, int cookie,
 	// da fare confronto con quello mio dell'anno scorso
 	// snprintf(http_header + strlen(http_header),sizeof(http_header),"\r\nSet-Cookie: client=%d; Expires=Wed, 08 Dec 2021 10:18:14 GMT+1", cookie);
 	
-	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d %s;", cookie, COOKIE_EXPIRE); // 2021
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // 2021
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -434,17 +434,18 @@ void manage_http_requests(int client_fd
 //     option_val++; // rimuovo gli spazi vuoti
 // sscanf(option_val, "%d", &UIDcookie);
 
-	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	// UIDcookie = atoi(strtokr_save);
+	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
+	UIDcookie = atoi(strtokr_save);
 
-	char *iduser = "UserID=";
-	option_val = strtok_r(NULL, "\r\n", &strtokr_save);
-	//remove blank spaces
-	while(option_val != NULL && *option_val == ' ')
-			option_val++;
+	// char *iduser = "UserID=";
+	// option_val = strtok_r(NULL, "\r\n", &strtokr_save);
+	// //remove blank spaces
+	// while(option_val != NULL && *option_val == ' ')
+	// 		option_val++;
 
-	if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
-		sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
+	// if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
+	// 	sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
+	// manca il conteggio del numero delle richieste...basta utilizzare il codice di sopra...?
 
 /*** TO BE DONE 5.0 END ***/
 
