@@ -247,13 +247,9 @@ void send_response(int client_fd, int response_code, int cookie,
 
 	// trial
 	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
-	// 	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", COOKIE_EXPIRE);
+	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
+	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, time_as_string);
 	// printf("%d", now_tm.tm_year); // test
-
-	// debug:
-	// non arriva qua dentro, c'è qualcosa di sbagliato nel resto del codice
-	// da fare confronto con quello mio dell'anno scorso
-	// snprintf(http_header + strlen(http_header),sizeof(http_header),"\r\nSet-Cookie: client=%d; Expires=Wed, 08 Dec 2021 10:18:14 GMT+1", cookie);
 	
 	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // 2021
 
