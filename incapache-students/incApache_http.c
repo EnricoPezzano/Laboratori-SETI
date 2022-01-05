@@ -272,12 +272,14 @@ void send_response(int client_fd, int response_code, int cookie,
 		     see gmtime and strftime ***/
 /*** TO BE DONE 5.0 START ***/
 
-	gmtime_r(&file_modification_time, &file_modification_tm); // saves the return value in a struct * tm (&file_modification_tm)
-	if(&file_modification_tm == NULL) //[...] or null pointer on error [...] (cppreference.com)
-		fail_errno("Could not get the time from gmtime_r()");
+strftime(time_as_string,MAX_TIME_STR,"%a, %d %b %Y %T GMT",gmtime(&file_modification_time));
 
-	strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm); // salva le informazioni di &file_modification_tm dentro il buffer time_as_string
-			//(char *restrict s, size_t maxsize, const char *restrict format, const struct tm *restrict timeptr);
+	// gmtime_r(&file_modification_time, &file_modification_tm); // saves the return value in a struct * tm (&file_modification_tm)
+	// if(&file_modification_tm == NULL) //[...] or null pointer on error [...] (cppreference.com)
+	// 	fail_errno("Could not get the time from gmtime_r()");
+
+	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm); // salva le informazioni di &file_modification_tm dentro il buffer time_as_string
+	// 		//(char *restrict s, size_t maxsize, const char *restrict format, const struct tm *restrict timeptr);
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -528,7 +530,7 @@ void manage_http_requests(int client_fd
 	// if(stat_p->st_mtime > my_timegm(&since_tm)) //Confronto le date dei due file per vedere se è stato modificato oppure no
 	// 	http_method = METHOD_NOT_CHANGED;
 
-	if(my_timegm(&since_tm) > stat_p->st_mtime) // if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0)
+	if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0) // if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0)
         http_method = METHOD_NOT_CHANGED;
     else
 		http_method = METHOD_CONDITIONAL;
