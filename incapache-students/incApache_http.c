@@ -241,12 +241,12 @@ void send_response(int client_fd, int response_code, int cookie,
 /*** TO BE DONE 5.0 START ***/
 
 // start trial...
-	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
-	// strftime(COOKIE_EXPIRE, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
-	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE);
+	now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
+	strftime(COOKIE_EXPIRE, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE);
 // end trial...
 
-	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // 2021
+	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // 2021
 
 /*** TO BE DONE 5.0 END ***/
 
