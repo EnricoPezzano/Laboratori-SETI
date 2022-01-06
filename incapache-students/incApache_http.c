@@ -503,7 +503,7 @@ void manage_http_requests(int client_fd
 	// 	http_method = METHOD_NOT_CHANGED;
 // end trial...
 
-	if(my_timegm(&since_tm) > stat_p->st_mtime)) // if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0)
+	if(my_timegm(&since_tm) > stat_p->st_mtime) // if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0)
         http_method = METHOD_NOT_CHANGED;
     else
 		http_method = METHOD_CONDITIONAL;
