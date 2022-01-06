@@ -59,7 +59,7 @@ time_t my_timegm(struct tm *tm)
 /*** TO BE DONE 5.0 START ***/
 
     pthread_mutex_lock(&my_timegm_mutex);
-    tz = getenv("TZ"); // necessary?
+    tz = getenv("TZ"); // vedi man
 
 /*** TO BE DONE 5.0 END ***/
 
