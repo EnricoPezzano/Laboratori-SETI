@@ -193,8 +193,8 @@ void send_response(int client_fd, int response_code, int cookie,
 	// file_modification_time = stat_p->st_mtime;
 // end trial...
 
-	char * tmp = HTML_mime;
-	mime_type = get_mime_type(tmp);
+	// char * tmp = HTML_mime;
+	mime_type = get_mime_type(HTML_404);
 	if(stat_p == NULL) // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
 		stat_p = &stat_buffer;
 	if(stat(HTML_404, stat_p) == -1)
