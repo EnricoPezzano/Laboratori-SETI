@@ -185,24 +185,21 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	struct stat tmp;
-	mime_type = get_mime_type(HTML_404);
-	if(stat_p == NULL)
-		stat_p = &stat_buffer;
-	if(stat(HTML_404, stat_p) == -1)
-		fail_errno("Error in stat 404");
-	file_size = stat_p->st_size;
-	file_modification_time = stat_p->st_mtime;
-
-	// if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
+// start trial...
+	// if(stat_p == NULL)
 	// 	stat_p = &stat_buffer;
-	// 	if(stat(HTML_404, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-	// 		fail_errno("stat error(404)");
-	// }
-
 	// file_size = stat_p->st_size;
 	// mime_type = get_mime_type(HTML_404);
 	// file_modification_time = stat_p->st_mtime;
+// end trial...
+
+	mime_type = get_mime_type(HTML_mime);
+	if(stat_p == NULL) // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
+		stat_p = &stat_buffer;
+	if(stat(HTML_404, stat_p) == -1)
+		fail_errno("Stat error (section 404)");
+	file_size = stat_p->st_size;
+	file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -215,24 +212,21 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_501 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// if(stat_p == NULL){ // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
+// start trial...
+	// if(stat_p == NULL)
 	// 	stat_p = &stat_buffer;
-	// 	if(stat(HTML_501, stat_p) != 0) // exit 0 on success, and >0 if an error occurs
-	// 		fail_errno("stat error(404)");
-	// }
-
 	// file_size = stat_p->st_size;
 	// mime_type = get_mime_type(HTML_501);
 	// file_modification_time = stat_p->st_mtime;
+// end trial...
 
-	struct stat tmp;
-	mime_type = get_mime_type(HTML_501);
-	if(stat_p == NULL)
+	mime_type = get_mime_type(HTML_mime);
+	if(stat_p == NULL) // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
 		stat_p = &stat_buffer;
 	if(stat(HTML_501, stat_p) == -1)
-		fail_errno("Error: stat 501");
-	 file_size = stat_p->st_size;
-	 file_modification_time = stat_p->st_mtime;
+		fail_errno("Stat error (section 501)");
+	file_size = stat_p->st_size;
+	file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -245,12 +239,12 @@ void send_response(int client_fd, int response_code, int cookie,
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// trial
+// start trial...
 	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
-	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
-	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, time_as_string);
-	// printf("%d", now_tm.tm_year); // test
-	
+	// strftime(COOKIE_EXPIRE, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
+	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE);
+// end trial...
+
 	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // 2021
 
 /*** TO BE DONE 5.0 END ***/
@@ -268,14 +262,13 @@ void send_response(int client_fd, int response_code, int cookie,
 		     see gmtime and strftime ***/
 /*** TO BE DONE 5.0 START ***/
 
-strftime(time_as_string,MAX_TIME_STR,"%a, %d %b %Y %T GMT",gmtime(&file_modification_time));
-
+// start trial...
 	// gmtime_r(&file_modification_time, &file_modification_tm); // saves the return value in a struct * tm (&file_modification_tm)
 	// if(&file_modification_tm == NULL) //[...] or null pointer on error [...] (cppreference.com)
 	// 	fail_errno("Could not get the time from gmtime_r()");
+// end trial...
 
-	// strftime(time_as_string, MAX_TIME_STR, "%a, %d %b %Y %H:%M:%S GMT", &file_modification_tm); // salva le informazioni di &file_modification_tm dentro il buffer time_as_string
-	// 		//(char *restrict s, size_t maxsize, const char *restrict format, const struct tm *restrict timeptr);
+	strftime(time_as_string,MAX_TIME_STR,"%a, %d %b %Y %T GMT",gmtime(&file_modification_time));
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -307,7 +300,7 @@ strftime(time_as_string,MAX_TIME_STR,"%a, %d %b %Y %T GMT",gmtime(&file_modifica
 		/*** send fd file on client_fd, then close fd; see syscall sendfile  ***/
 /*** TO BE DONE 5.0 START ***/
 
-	if (sendfile(client_fd, fd, NULL, file_size) == -1) //da studiare sul man
+	if (sendfile(client_fd, fd, NULL, file_size) == -1) // vedi man
 		fail_errno("cannot send fd file on client_fd");
 
 /*** TO BE DONE 5.0 END ***/
@@ -366,7 +359,7 @@ void manage_http_requests(int client_fd
 		 *** filename, and protocol ***/
 /*** TO BE DONE 5.0 START ***/
 
-	//divido la stringa in 3 parti (ripassa sul man)
+	//divido la stringa in 3 parti (vedi man)
     method_str = strtok_r(http_request_line, " ", &strtokr_save);
     filename = strtok_r(NULL, " ", &strtokr_save);
     protocol = strtok_r(NULL, "\r\n", &strtokr_save);
