@@ -496,13 +496,6 @@ void manage_http_requests(int client_fd
 				 ***/
 /*** TO BE DONE 5.0 START ***/
 
-// start trial...
-	// if (stat(filename, stat_p)) //All'interno di stat_p verranno messe le informazioni relative al file con come filename
-	// 	fail_errno("stat");
-	// if(stat_p->st_mtime > my_timegm(&since_tm)) //Confronto le date dei due file per vedere se è stato modificato oppure no
-	// 	http_method = METHOD_NOT_CHANGED;
-// end trial...
-
 	if(my_timegm(&since_tm) > stat_p->st_mtime) // if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0)
         http_method = METHOD_NOT_CHANGED;
     else
