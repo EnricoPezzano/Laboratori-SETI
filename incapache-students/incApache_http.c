@@ -420,16 +420,6 @@ void manage_http_requests(int client_fd
 
 	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
 	UIDcookie = atoi(strtokr_save);
-	// con questa versione c'è il conteggio delle richieste, manca da stampare la risposta "200 ok" che avviene solo con back to homepage
-
-	// char *iduser = "UserID=";
-	// option_val = strtok_r(NULL, "\r\n", &strtokr_save);
-	// //remove blank spaces
-	// while(option_val != NULL && *option_val == ' ')
-	// 		option_val++;
-	// if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
-	// 	sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
-	// manca il conteggio del numero delle richieste...basta utilizzare il codice di sopra...?
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -440,19 +430,19 @@ void manage_http_requests(int client_fd
 				 *** and possibly add METHOD_CONDITIONAL flag to http_method
 /*** TO BE DONE 5.0 START ***/
 
-	// trial
+// start trial...
 	// if( strcmp(option_name, "If-Modified-Since") == 0 ){
 	// 	http_method = METHOD_CONDITIONAL;
-	// 	++strtokr_save;
+	// 	strtokr_save++;
 	// 	option_val = strtok_r(NULL, " \r", &strtokr_save);
-	// 	strptime(option_val,"%a, %d %b %Y %H:%M:%S GMT",&since_tm); // given a date return a broken-down time
 	// }
+// end trial...
 
 	option_name = strtok(http_option_line, ": "); // option_line parsing and storing in option_name
 	option_val = strtok_r(NULL, "GMT", &strtokr_save);
 
 	if(strcmp(option_name, "If-Modified-Since") == 0)
-		http_method += METHOD_CONDITIONAL;
+		http_method = METHOD_CONDITIONAL;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -506,13 +496,14 @@ void manage_http_requests(int client_fd
 				 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// trial
+// start trial...
 	// if (stat(filename, stat_p)) //All'interno di stat_p verranno messe le informazioni relative al file con come filename
 	// 	fail_errno("stat");
 	// if(stat_p->st_mtime > my_timegm(&since_tm)) //Confronto le date dei due file per vedere se è stato modificato oppure no
 	// 	http_method = METHOD_NOT_CHANGED;
+// end trial...
 
-	if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0) // if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0)
+	if(my_timegm(&since_tm) > stat_p->st_mtime)) // if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0)
         http_method = METHOD_NOT_CHANGED;
     else
 		http_method = METHOD_CONDITIONAL;
