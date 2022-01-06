@@ -78,34 +78,23 @@ pthread_mutex_t mime_mutex = PTHREAD_MUTEX_INITIALIZER;
 	 *** connection_no[i] ***/
 /*** TO BE DONE 5.1 START ***/
 
-	if (to_join[conn_no] == NULL)
+	if(to_join[conn_no] == NULL) // controllo
 		return;
 
-	for (i=MAX_CONNECTIONS; i<MAX_THREADS; ++i)
-		if (to_join[conn_no] == &thread_ids[i])
+	for(i=MAX_CONNECTIONS; i<MAX_THREADS; i++) // calcolo l'indice i
+		if(to_join[conn_no] == &thread_ids[i])
 			break;
 
-	if (pthread_join(thread_ids[i],NULL) == -1)
+	if(pthread_join(thread_ids[i],NULL) == -1)
 		fail_errno("Cannot join all the threads");
-	--no_response_threads[conn_no];
+	
+	// aggiorno le variabili
+	no_response_threads[conn_no]--;
+	if(no_response_threads[conn_no] == 0) // why?
+		no_free_threads++;
 
-	if(no_response_threads[conn_no] == 0) // ripassa questo passaggio
-		++no_free_threads;	// vale 16
 	connection_no[i] = FREE_SLOT;
 	to_join[conn_no] = NULL;
-	
-	// // vers gabri
-	// compute index i of the thread to join 
-	// i = to_join[conn_no];
-	// if(pthread_join(thread_ids[i], NULL) != 0)
-	// 	fail_errno("threads.c - join_all_threads() - pthread_join() error");
-	
-	// //update shared variables
-	// pthread_mutex_lock(&threads_mutex);
-	// no_free_threads++;	
-	// no_response_threads[conn_no]--;
-	// connection_no[i] = FREE_SLOT ;
-	// pthread_mutex_unlock(&threads_mutex); // non serve evitare la concorrenza
 
 /*** TO BE DONE 5.1 END ***/
 
@@ -125,39 +114,25 @@ pthread_mutex_t mime_mutex = PTHREAD_MUTEX_INITIALIZER;
 	 *** avoiding race conditions ***/
 /*** TO BE DONE 5.1 START ***/
 
-	if (to_join[thrd_no] != NULL){
+	if(to_join[thrd_no] != NULL){ // is there a previous case to join?
 		conn_no = connection_no[thrd_no];
-		for(i=MAX_CONNECTIONS; i<MAX_THREADS; ++i)
+		for(i=MAX_CONNECTIONS; i<MAX_THREADS; i++) // computing index i
 			if(to_join[thrd_no] == &thread_ids[i])
 				break;
 		
 		if(pthread_join(thread_ids[i],NULL) == -1)
 			fail_errno("Cannot join the thread");
 
+		// updating variables, avoiding race conditions
 		pthread_mutex_lock(&threads_mutex);
-		--no_response_threads[conn_no];
-		if(no_response_threads[conn_no] == 0)
-			++no_free_threads;
-		connection_no[i]= FREE_SLOT;
-		debug("\t... join_prev_thread(%d): joining with %lu, connection %d\n",thrd_no,i,conn_no);
+			no_response_threads[conn_no]--;
+			if(no_response_threads[conn_no] == 0)
+				no_free_threads++;
+			connection_no[i] = FREE_SLOT;
+			debug("\t... join_prev_thread(%d): joining with %lu, connection %d\n",thrd_no,i,conn_no);
 		pthread_mutex_unlock(&threads_mutex);
 	}
 	debug("end of join_prev_thread(%d): was first\n",thrd_no);
-
-	// vers gabri
-	// if(to_join[thrd_no] == NULL)
-	// 	return;
-
-	// i = to_join[thrd_no];
-	// if(pthread_join(thread_ids[i], NULL) != 0)
-	// 	fail_errno("threads.c - join_all_threads() - pthread_join() error");
-	
-	// //update shared variables
-	// pthread_mutex_lock(&threads_mutex);
-	// no_free_threads++;	
-	// no_response_threads[conn_no]--;
-	// connection_no[i] = FREE_SLOT ;
-	// pthread_mutex_unlock(&threads_mutex);
 
 /*** TO BE DONE 5.1 END ***/
 
