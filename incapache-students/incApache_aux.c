@@ -59,7 +59,7 @@ time_t my_timegm(struct tm *tm)
 /*** TO BE DONE 5.0 START ***/
 
     pthread_mutex_lock(&my_timegm_mutex);
-    tz = getenv("TZ"); // vedi man
+    // tz = getenv("TZ"); // vedi man // only last year difference
 
 /*** TO BE DONE 5.0 END ***/
 
