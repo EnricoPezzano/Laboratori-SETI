@@ -247,6 +247,7 @@ void send_response(int client_fd, int response_code, int cookie,
 // end trial...
 
 	printf("ciaoooooooooo2");
+//così il codice funziona (stampa set-cookie etc), prova a sistemarlo pezzo per pezzo finchè non trovi quello sbagliato
 	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
