@@ -235,7 +235,7 @@ void send_response(int client_fd, int response_code, int cookie,
 		break;
 	}
 	strcat(http_header, "\r\nDate: ");
-	strcat(http_header, time_as_string);
+	strcat(http_header, time_as_string);printf("ciaoooooooooo");
         if ( cookie >= 0 ) {
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
@@ -246,7 +246,8 @@ void send_response(int client_fd, int response_code, int cookie,
 	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE);
 // end trial...
 
-	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // 2021
+	printf("ciaoooooooooo");
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
 
