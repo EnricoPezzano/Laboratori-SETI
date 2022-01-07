@@ -186,21 +186,21 @@ void send_response(int client_fd, int response_code, int cookie,
 /*** TO BE DONE 5.0 START ***/
 
 // start trial...
-	// if(stat_p == NULL)
-	// 	stat_p = &stat_buffer;
-	// file_size = stat_p->st_size;
-	// mime_type = get_mime_type(HTML_404);
-	// file_modification_time = stat_p->st_mtime;
+	if(stat_p == NULL)
+		stat_p = &stat_buffer;
+	file_size = stat_p->st_size;
+	mime_type = get_mime_type(HTML_404);
+	file_modification_time = stat_p->st_mtime;
 // end trial...
 
-	// char * tmp = HTML_mime; 
-	mime_type = get_mime_type(HTML_404); // con HTML_mime da un warning...
-	if(stat_p == NULL) // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
-		stat_p = &stat_buffer;
-	if(stat(HTML_404, stat_p) == -1)
-		fail_errno("Stat error (section 404)");
-	file_size = stat_p->st_size;
-	file_modification_time = stat_p->st_mtime;
+	// // char * tmp = HTML_mime; 
+	// mime_type = get_mime_type(HTML_404); // con HTML_mime da un warning...
+	// if(stat_p == NULL) // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
+	// 	stat_p = &stat_buffer;
+	// if(stat(HTML_404, stat_p) == -1)
+	// 	fail_errno("Stat error (section 404)");
+	// file_size = stat_p->st_size;
+	// file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
@@ -214,20 +214,20 @@ void send_response(int client_fd, int response_code, int cookie,
 /*** TO BE DONE 5.0 START ***/
 
 // start trial...
-	// if(stat_p == NULL)
-	// 	stat_p = &stat_buffer;
-	// file_size = stat_p->st_size;
-	// mime_type = get_mime_type(HTML_501);
-	// file_modification_time = stat_p->st_mtime;
+	if(stat_p == NULL)
+		stat_p = &stat_buffer;
+	file_size = stat_p->st_size;
+	mime_type = get_mime_type(HTML_501);
+	file_modification_time = stat_p->st_mtime;
 // end trial...
 
-	mime_type = get_mime_type(HTML_501); // con HTML_mime da un warning...
-	if(stat_p == NULL) // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
-		stat_p = &stat_buffer;
-	if(stat(HTML_501, stat_p) == -1)
-		fail_errno("Stat error (section 501)");
-	file_size = stat_p->st_size;
-	file_modification_time = stat_p->st_mtime;
+	// mime_type = get_mime_type(HTML_501); // con HTML_mime da un warning...
+	// if(stat_p == NULL) // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
+	// 	stat_p = &stat_buffer;
+	// if(stat(HTML_501, stat_p) == -1)
+	// 	fail_errno("Stat error (section 501)");
+	// file_size = stat_p->st_size;
+	// file_modification_time = stat_p->st_mtime;
 
 /*** TO BE DONE 5.0 END ***/
 
