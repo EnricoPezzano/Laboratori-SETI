@@ -90,7 +90,7 @@ pthread_mutex_t mime_mutex = PTHREAD_MUTEX_INITIALIZER;
 	
 	// aggiorno le variabili
 	no_response_threads[conn_no]--;
-	if(no_response_threads[conn_no] == 0) // why?
+	if(no_response_threads[conn_no] == 0) // vedi man
 		no_free_threads++;
 
 	connection_no[i] = FREE_SLOT;

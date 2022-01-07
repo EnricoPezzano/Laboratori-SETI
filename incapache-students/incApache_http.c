@@ -420,7 +420,6 @@ void manage_http_requests(int client_fd
 // 	}
 // }
 
-	// 2020
 	char *iduser = "UserID=";
 	option_val = strtok_r(NULL, "\r\n", &strtokr_save);
 	//remove blank spaces
