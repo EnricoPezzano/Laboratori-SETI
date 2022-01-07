@@ -421,17 +421,17 @@ void manage_http_requests(int client_fd
 // }
 
 	// 2020
-	// char *iduser = "UserID=";
-	// option_val = strtok_r(NULL, "\r\n", &strtokr_save);
-	// //remove blank spaces
-	// while(option_val != NULL && *option_val == ' ')
-	// 		option_val++;
+	char *iduser = "UserID=";
+	option_val = strtok_r(NULL, "\r\n", &strtokr_save);
+	//remove blank spaces
+	while(option_val != NULL && *option_val == ' ')
+			option_val++;
 
-	// if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
-	// 	sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
+	if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
+		sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
 
-	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	UIDcookie = atoi(strtokr_save);
+	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
+	// UIDcookie = atoi(strtokr_save);
 
 /*** TO BE DONE 5.0 END ***/
 
