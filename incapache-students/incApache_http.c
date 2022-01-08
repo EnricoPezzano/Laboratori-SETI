@@ -423,8 +423,8 @@ void manage_http_requests(int client_fd
 	char *iduser = "UserID="; // old, stampa set-cookie, ma non client provided UID Cookie x for the x time
 	option_val = strtok_r(NULL, " \r\n", &strtokr_save);
 	//remove blank spaces
-	// while(option_val != NULL && *option_val == ' ')
-	// 		option_val++;
+	while(option_val != NULL && *option_val == ' ')
+			option_val++;
 
 	if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
 		sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
