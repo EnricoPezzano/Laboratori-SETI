@@ -420,14 +420,14 @@ void manage_http_requests(int client_fd
 // 	}
 // }
 
-	// char *iduser = "UserID="; // old, stampa set-cookie, ma non client provided UID Cookie x for the x time
-	// option_val = strtok_r(NULL, "\r\n", &strtokr_save);
-	// //remove blank spaces
+	char *iduser = "UserID="; // old, stampa set-cookie, ma non client provided UID Cookie x for the x time
+	option_val = strtok_r(NULL, " \r\n", &strtokr_save);
+	//remove blank spaces
 	// while(option_val != NULL && *option_val == ' ')
 	// 		option_val++;
 
-	// if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
-	// 	sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
+	if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
+		sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
 
 	// new, stampa client provided UID Cookie x for the x time, ma non set-cookie...
 	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
