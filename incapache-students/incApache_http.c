@@ -433,10 +433,23 @@ void manage_http_requests(int client_fd
 	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
 	// UIDcookie = atoi(strtokr_save); // client provided UID Cookie 1 for the 1 time
 
-	char* aux = strtok_r(NULL, "=", &strtokr_save);
-	//aux == 'UserID'
-	option_val = strtok_r(NULL, " ", &strtokr_save);
-	UIDcookie = atoi(option_val);
+	// gabriele
+	// char* aux = strtok_r(NULL, "=", &strtokr_save);
+	// //aux == 'UserID'
+	// option_val = strtok_r(NULL, " ", &strtokr_save);
+	// UIDcookie = atoi(option_val);
+
+	// ginger
+	++strtokr_save; //Togliamo i ':' dalla stringa
+	option_val = strtok_r(NULL, " \r", &strtokr_save);
+	sscanf(option_val, "%d", &UIDcookie);
+
+	// numero strano
+	// strtok_r(NULL, "=", &strtokr_save);
+	// UIDcookie = atoi(strtok_r(NULL, " ", &strtokr_save));
+	// debug("Cookie id=%d\n", UIDcookie);
+
+	
 
 /*** TO BE DONE 5.0 END ***/
 
