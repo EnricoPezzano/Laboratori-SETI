@@ -420,36 +420,36 @@ void manage_http_requests(int client_fd
 // 	}
 // }
 
-	// char *iduser = "UserID="; // old, stampa set-cookie, ma non client provided UID Cookie x for the x time
-	// option_val = strtok_r(NULL, " \r\n", &strtokr_save);
-	// //remove blank spaces
-	// while(option_val != NULL && *option_val == ' ')
-	// 		option_val++;
+// old, stampa set-cookie, ma non client provided UID Cookie x for the x time
+	char *iduser = "UserID="; 
+	option_val = strtok_r(NULL, " \r\n", &strtokr_save);
+	//remove blank spaces
+	while(option_val != NULL && *option_val == ' ')
+			option_val++;
+	if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
+		sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
 
-	// if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
-	// 	sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
-
-	// // new, stampa client provided UID Cookie x for the x time, ma non set-cookie...
+// new, stampa client provided UID Cookie x for the x time, ma non set-cookie...
 	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
 	// UIDcookie = atoi(strtokr_save); // client provided UID Cookie 1 for the 1 time
 
-	// gabriele
-	char* aux = strtok_r(NULL, "=", &strtokr_save);
-	//aux == 'UserID'
-	option_val = strtok_r(NULL, " ", &strtokr_save);
-	UIDcookie = atoi(option_val);
+// gabriele, stampa client provided UID Cookie x for the x time, ma non set-cookie...(id sbagliato)
+	// char* aux = strtok_r(NULL, "=", &strtokr_save);
+	// //aux == 'UserID'
+	// option_val = strtok_r(NULL, " ", &strtokr_save);
+	// UIDcookie = atoi(option_val);
 
-	// ginger, stampa set-cookie, ma non client provided UID Cookie x for the x time
+// ginger, stampa set-cookie, ma non client provided UID Cookie x for the x time (id giusto)
 	// ++strtokr_save; //Togliamo i ':' dalla stringa
 	// option_val = strtok_r(NULL, " \r", &strtokr_save);
 	// sscanf(option_val, "%d", &UIDcookie);
 
-	// numero strano
+// numero strano
 	// strtok_r(NULL, "=", &strtokr_save);
 	// UIDcookie = atoi(strtok_r(NULL, " ", &strtokr_save));
 	// debug("Cookie id=%d\n", UIDcookie);
 
-	// twingo
+// twingo
 	// strtok_r(strtokr_save,"=",&strtokr_save);
 	// UIDcookie=atoi(strtok_r(strtokr_save,"\r\n",&strtokr_save));
 	
