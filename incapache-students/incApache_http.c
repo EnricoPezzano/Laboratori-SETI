@@ -440,9 +440,9 @@ void manage_http_requests(int client_fd
 	// UIDcookie = atoi(option_val);
 
 // ginger, stampa set-cookie, ma non client provided UID Cookie x for the x time (id giusto)
-	// ++strtokr_save; //Togliamo i ':' dalla stringa
-	// option_val = strtok_r(NULL, " \r", &strtokr_save);
-	// sscanf(option_val, "%d", &UIDcookie);
+	++strtokr_save; //Togliamo i ':' dalla stringa
+	option_val = strtok_r(NULL, " \r", &strtokr_save);
+	sscanf(option_val, "%d", &UIDcookie);
 
 // numero strano, stampa client provided UID Cookie x for the x time, ma non set-cookie...(Cookie: id=2; id=1
 				// Cookie id=2)
@@ -450,9 +450,9 @@ void manage_http_requests(int client_fd
 	// UIDcookie = atoi(strtok_r(NULL, " ", &strtokr_save));
 	// debug("Cookie id=%d\n", UIDcookie);
 
-// twingo
-	strtok_r(strtokr_save,"=",&strtokr_save);
-	UIDcookie=atoi(strtok_r(strtokr_save,"\r\n",&strtokr_save));
+// twingo, stampa client provided UID Cookie x for the x time, ma non set-cookie...(Cookie: id=2; id=1)
+	// strtok_r(strtokr_save,"=",&strtokr_save);
+	// UIDcookie=atoi(strtok_r(strtokr_save,"\r\n",&strtokr_save));
 	
 
 /*** TO BE DONE 5.0 END ***/
