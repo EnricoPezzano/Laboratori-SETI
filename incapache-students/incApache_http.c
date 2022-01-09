@@ -421,13 +421,13 @@ void manage_http_requests(int client_fd
 // }
 
 // old, stampa set-cookie, ma non client provided UID Cookie x for the x time (id giusto)
-	// char *iduser = "UserID="; 
-	// option_val = strtok_r(NULL, " \r\n", &strtokr_save);
-	// //remove blank spaces
-	// while(option_val != NULL && *option_val == ' ')
-	// 		option_val++;
-	// if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
-	// 	sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
+	char *iduser = "UserID="; 
+	option_val = strtok_r(NULL, " \r\n", &strtokr_save);
+	//remove blank spaces
+	while(option_val != NULL && *option_val == ' ')
+			option_val++;
+	if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
+		sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
 
 // new, stampa client provided UID Cookie x for the x time, ma non set-cookie... (Cookie: id=2; id=1)
 	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
@@ -440,9 +440,9 @@ void manage_http_requests(int client_fd
 	// UIDcookie = atoi(option_val);
 
 // ginger, stampa set-cookie, ma non client provided UID Cookie x for the x time (id giusto)
-	++strtokr_save; //Togliamo i ':' dalla stringa
-	option_val = strtok_r(NULL, " \r", &strtokr_save);
-	sscanf(option_val, "%d", &UIDcookie);
+	// ++strtokr_save; //Togliamo i ':' dalla stringa
+	// option_val = strtok_r(NULL, " \r", &strtokr_save);
+	// sscanf(option_val, "%d", &UIDcookie);
 
 // numero strano, stampa client provided UID Cookie x for the x time, ma non set-cookie...(Cookie: id=2; id=1
 				// Cookie id=2)
