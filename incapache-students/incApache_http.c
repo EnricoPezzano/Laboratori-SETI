@@ -429,11 +429,11 @@ void manage_http_requests(int client_fd
 	// if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
 	// 	sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
 
-// new, stampa client provided UID Cookie x for the x time, ma non set-cookie...
-	strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	UIDcookie = atoi(strtokr_save); // client provided UID Cookie 1 for the 1 time
+// new, stampa client provided UID Cookie x for the x time, ma non set-cookie... (Cookie: id=2; id=1)
+	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
+	// UIDcookie = atoi(strtokr_save); // client provided UID Cookie 1 for the 1 time
 
-// gabriele, stampa client provided UID Cookie x for the x time, ma non set-cookie...(id sbagliato)
+// gabriele, stampa client provided UID Cookie x for the x time, ma non set-cookie...(Cookie: id=2; id=1)
 	// char* aux = strtok_r(NULL, "=", &strtokr_save);
 	// //aux == 'UserID'
 	// option_val = strtok_r(NULL, " ", &strtokr_save);
@@ -445,9 +445,9 @@ void manage_http_requests(int client_fd
 	// sscanf(option_val, "%d", &UIDcookie);
 
 // numero strano
-	// strtok_r(NULL, "=", &strtokr_save);
-	// UIDcookie = atoi(strtok_r(NULL, " ", &strtokr_save));
-	// debug("Cookie id=%d\n", UIDcookie);
+	strtok_r(NULL, "=", &strtokr_save);
+	UIDcookie = atoi(strtok_r(NULL, " ", &strtokr_save));
+	debug("Cookie id=%d\n", UIDcookie);
 
 // twingo
 	// strtok_r(strtokr_save,"=",&strtokr_save);
