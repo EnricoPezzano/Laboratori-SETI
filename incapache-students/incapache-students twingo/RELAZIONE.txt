@@ -1,0 +1,19 @@
+Laboratorio di SETI
+IncApache
+Componenti del gruppo: Curcio Francesco, Haider Ali, Pedemonte Giacomo
+
+
+Lo scopo del laboratorio IncApache era quello di implementare un server web capace di gestire richieste di tipo HEAD e GET (anche CONDITIONAL GET).
+
+Per testare il funzionamento dei COOKIE abbiamo mandato delle richieste di tipo GET al server, tramite telnet, senza nessun cookie;
+Il server risponde in modo corretto aggiungendo l'opzione "Set-Cookie:" assegnandoci un nuovo UserID;
+Le successive richieste, sempre fatte con telnet, sono state mandate con l'opzione "Cookie:"
+seguita dal valore di UserID precedentemente assegnato dal server.
+In questo modo abbiamo anche controllato dal terminale in cui è stato lanciato il server se il numero di richieste fatte dal nostro UserId veniva incrementato in modo corretto.
+Abbiamo poi provato a fare le richieste tramite il browser, il meccanismo dei cookie si comporta in modo corretto anche in questa situazione, abbiamo potuto notare che i cookie che il server assegna in risposta ad una richiesta vengono salvati dal browser e restano memorizzati anche dopo averlo chiuso e utilizzati dal broswer fino al momento della scadenza del cookie (che abbiamo impostato al 31/12/2021 23:59:59 GMT). Accedendo alle impostazione del broswer avevamo la possibilita di eliminare tutti i cookie precedentemente assegnati.
+
+Per testare il funzionamento delle CONDITIONAL GET abbiamo inizialmente mandato delle richieste di tipo GET tramite telnet, aggiungendo l'opzione "If-Modified-Since:" seguita da una data in formato GMT, abbiamo constato che quando mettevamo una data diversa da quella dell'ultima modifica del file sul server la risposta era di tipo 200 OK seguita dalla nuova versione del file richiesto, mentre quando la data scritta da noi dopo l'opzione "If-Modified-Since:" era uguale alla data di ultima modifica del file sul server la risposta era di tipo 304 NOT MODIFIED senza nessun file allegato.
+Successivamente abbiamo provato la CONDITIONAL GET tramite richieste del broswer facendo numerose volte il refresh (F5) della pagina ed ogni refresh corrispondeva ad una CONDITIONAL GET fatta al server a cui la risposta era 304 NOT MODIFIED, abbiamo poi modificato i file .html presenti nella cartella "www-root" e le CONDITIONAL GET  questa volta ricevevano risposte del tipo 200 OK seguite dalla nuova versione del file.
+
+Per controllare il funzionamento dei thread sotto sforzo abbiamo fatto tramite broswer una richiesta di una pagina html (creata da noi) che conteneva 75 immagini diverse, in questo modo il broswer dopo aver ricevuto la pagina html dal server ha dovuto fare 75 richieste diverse di tipo GET (tutte con lo stesso cookie UserID), tutte le richieste andavano a buon fine e l'accesso alle sezioni critiche non dava problemi in quanto il conteggio delle richieste fatte da questo userID risultava essere corretto ad ogni test di questo tipo.
+Inoltre abbiamo creato uno script che mandava un grande numero di richieste senza mai usare l'opzione cookie, in questo modo ad ogni richiesta doveva arrivare una risposta con un nuovo UserId; le richieste andavano a buon fine e ricevevano la risposta che si ci aspettava, inoltre il meccanismo di assegnazione di un nuovo UserId funzionava in modo corretto.
