@@ -455,9 +455,9 @@ void manage_http_requests(int client_fd
 	// UIDcookie=atoi(strtok_r(strtokr_save,"\r\n",&strtokr_save));
 	
 // pippo rottigni
-	option_val = strtok_r(strtokr_save + strlen("UserID=") + 1, "\r\n",  &strtokr_save);
-	if(option_val != NULL)
-    	sscanf(option_val, "%d", &UIDcookie);
+	strtok_r(strtokr_save + strlen("UserID=") + 1, "\r\n",  &strtokr_save);
+	if(strtokr_save != NULL)
+    	sscanf(strtokr_save, "%d", &UIDcookie);
 
 /*** TO BE DONE 5.0 END ***/
 
