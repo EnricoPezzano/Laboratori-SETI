@@ -70,7 +70,7 @@ int get_new_UID(void)
 	CurUID++;
 	retval = CurUID % MAX_COOKIES;
 	UserTracker[retval] = 0;
-	// CurUID = retval;
+
 	if(pthread_mutex_unlock(&cookie_mutex) != 0)
 		fail_errno("cannot unlock shared resource");
 
@@ -129,9 +129,6 @@ void send_response(int client_fd, int response_code, int cookie,
 	/*** Compute date of servicing current HTTP Request using a variant of gmtime() ***/
 /*** TO BE DONE 5.0 START ***/
 
-	// if(my_timegm(&now_tm) == -1) // ret = mktime(tm); non restituisce il time corretto
-	// 	fail_errno("Cannot get the time");
-
 	if(gmtime_r(&now_t, &now_tm) == NULL)
  		fail_errno("cannot get current time via gmtime_r");
 
@@ -185,15 +182,6 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_404 ***/
 /*** TO BE DONE 5.0 START ***/
 
-// start trial...
-	// if(stat_p == NULL)
-	// 	stat_p = &stat_buffer;
-	// file_size = stat_p->st_size;
-	// mime_type = get_mime_type(HTML_404);
-	// file_modification_time = stat_p->st_mtime;
-// end trial...
-
-	// char * tmp = HTML_mime; 
 	mime_type = get_mime_type(HTML_404); // con HTML_mime da un warning...
 	if(stat_p == NULL) // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
 		stat_p = &stat_buffer;
@@ -213,14 +201,6 @@ void send_response(int client_fd, int response_code, int cookie,
 			/*** compute file_size, mime_type, and file_modification_time of HTML_501 ***/
 /*** TO BE DONE 5.0 START ***/
 
-// start trial...
-	// if(stat_p == NULL)
-	// 	stat_p = &stat_buffer;
-	// file_size = stat_p->st_size;
-	// mime_type = get_mime_type(HTML_501);
-	// file_modification_time = stat_p->st_mtime;
-// end trial...
-
 	mime_type = get_mime_type(HTML_501); // con HTML_mime da un warning...
 	if(stat_p == NULL) // controllo per evitare il segmentation fault (se NULL), altrimenti sono già dentro il server e non devo sovrascrivere stat_p
 		stat_p = &stat_buffer;
@@ -235,19 +215,11 @@ void send_response(int client_fd, int response_code, int cookie,
 		break;
 	}
 	strcat(http_header, "\r\nDate: ");
-	strcat(http_header, time_as_string);printf("ciaoooooooooo1");
+	strcat(http_header, time_as_string);
         if ( cookie >= 0 ) {
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
 
-// start trial...
-	// now_tm.tm_year++; // non è permanente, ma ha una scadenza parecchio in avanti nel tempo
-	// strftime(COOKIE_EXPIRE, MAX_TIME_STR, "%a, %d %b %Y %T GMT", &now_tm);
-	// sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d; Expires=%s;", cookie, COOKIE_EXPIRE);
-// end trial...
-
-	printf("ciaoooooooooo2");
-//così il codice funziona (stampa set-cookie etc), prova a sistemarlo pezzo per pezzo finchè non trovi quello sbagliato
 	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
@@ -264,12 +236,6 @@ void send_response(int client_fd, int response_code, int cookie,
 		/*** compute time_as_string, corresponding to file_modification_time, in GMT standard format;
 		     see gmtime and strftime ***/
 /*** TO BE DONE 5.0 START ***/
-
-// start trial...
-	// gmtime_r(&file_modification_time, &file_modification_tm); // saves the return value in a struct * tm (&file_modification_tm)
-	// if(&file_modification_tm == NULL) //[...] or null pointer on error [...] (cppreference.com)
-	// 	fail_errno("Could not get the time from gmtime_r()");
-// end trial...
 
 	strftime(time_as_string,MAX_TIME_STR,"%a, %d %b %Y %T GMT",gmtime(&file_modification_time));
 
@@ -303,7 +269,7 @@ void send_response(int client_fd, int response_code, int cookie,
 		/*** send fd file on client_fd, then close fd; see syscall sendfile  ***/
 /*** TO BE DONE 5.0 START ***/
 
-	if (sendfile(client_fd, fd, NULL, file_size) == -1) // vedi man
+	if(sendfile(client_fd, fd, NULL, file_size) == -1) // vedi man
 		fail_errno("cannot send fd file on client_fd");
 
 /*** TO BE DONE 5.0 END ***/
@@ -362,7 +328,7 @@ void manage_http_requests(int client_fd
 		 *** filename, and protocol ***/
 /*** TO BE DONE 5.0 START ***/
 
-	//divido la stringa in 3 parti (vedi man)
+	//divido la stringa in 3 parti
     method_str = strtok_r(http_request_line, " ", &strtokr_save);
     filename = strtok_r(NULL, " ", &strtokr_save);
     protocol = strtok_r(NULL, "\r\n", &strtokr_save);
@@ -402,59 +368,7 @@ void manage_http_requests(int client_fd
 			    if ( strcmp(option_name, "Cookie") == 0 ) {
                                 /*** parse the cookie in order to get the UserID and count the number of requests coming from this client ***/
 /*** TO BE DONE 5.0 START ***/
-	// man strtok_r example :)
-// char test[80], blah[80];
-// char *sep = "\\/:;=-";
-// char *word, *phrase, *brkt, *brkb;
-// strcpy(test, "This;is.a:test:of=the/string\\tokenizer-function.");
-// for (word = strtok_r(test, sep, &brkt);
-// 	word;
-// 	word = strtok_r(NULL, sep, &brkt))
-// {
-// 	strcpy(blah, "blah:blat:blab:blag");
-// 	for (phrase = strtok_r(blah, sep, &brkb);
-// 		phrase;
-// 		phrase = strtok_r(NULL, sep, &brkb))
-// 	{
-// 		printf("So far we're at %s:%s\n", word, phrase);
-// 	}
-// }
 
-// old, stampa set-cookie (alto), ma non client provided UID Cookie x for the x time (Cookie: id=2; id=1)
-	// char *iduser = "UserID="; 
-	// option_val = strtok_r(NULL, " \r\n", &strtokr_save);
-	// //remove blank spaces
-	// while(option_val != NULL && *option_val == ' ')
-	// 		option_val++;
-	// if(option_val != NULL && !strncmp(option_val,iduser,strlen(iduser)))
-	// 	sscanf(option_val + strlen(iduser),"%d",&UIDcookie);
-
-// new, stampa client provided UID Cookie x for the x time, ma non set-cookie... (Cookie: id=2; id=1)
-	// strtok_r(NULL, " \n\r=", &strtokr_save); // '\r' è il ritorno a capo, i separatori sono ' ', \n, = e \r
-	// UIDcookie = atoi(strtokr_save); // client provided UID Cookie 1 for the 1 time
-
-// gabriele, stampa client provided UID Cookie x for the x time, ma non set-cookie...(Cookie: id=2; id=1)
-	// char* aux = strtok_r(NULL, "=", &strtokr_save);
-	// //aux == 'UserID'
-	// option_val = strtok_r(NULL, " ", &strtokr_save);
-	// UIDcookie = atoi(option_val);
-
-// ginger, stampa set-cookie, ma non client provided UID Cookie x for the x time (Cookie: id=2; id=1)
-	// ++strtokr_save; //Togliamo i ':' dalla stringa
-	// option_val = strtok_r(NULL, " \r", &strtokr_save);
-	// sscanf(option_val, "%d", &UIDcookie);
-
-// numero strano, stampa client provided UID Cookie x for the x time, ma non set-cookie...(Cookie: id=2; id=1
-				// Cookie id=2)
-	// strtok_r(NULL, "=", &strtokr_save);
-	// UIDcookie = atoi(strtok_r(NULL, " ", &strtokr_save));
-	// debug("Cookie id=%d\n", UIDcookie);
-
-// twingo, stampa client provided UID Cookie x for the x time, ma non set-cookie...(Cookie: id=2; id=1)
-	// strtok_r(strtokr_save,"=",&strtokr_save);
-	// UIDcookie=atoi(strtok_r(strtokr_save,"\r\n",&strtokr_save));
-	
-// pippo rottigni
 	strtok_r(strtokr_save + strlen("UserID=") + 1, "\r\n",  &strtokr_save);
 	if(strtokr_save != NULL)
     	sscanf(strtokr_save, "%d", &UIDcookie);
@@ -467,14 +381,6 @@ void manage_http_requests(int client_fd
 				/*** parse option line, recognize "If-Modified-Since" option,
 				 *** and possibly add METHOD_CONDITIONAL flag to http_method
 /*** TO BE DONE 5.0 START ***/
-
-// start trial...
-	// if( strcmp(option_name, "If-Modified-Since") == 0 ){
-	// 	http_method = METHOD_CONDITIONAL;
-	// 	strtokr_save++;
-	// 	option_val = strtok_r(NULL, " \r", &strtokr_save);
-	// }
-// end trial...
 
 	option_name = strtok(http_option_line, ": "); // option_line parsing and storing in option_name
 	option_val = strtok_r(NULL, "GMT", &strtokr_save);
@@ -534,7 +440,7 @@ void manage_http_requests(int client_fd
 				 ***/
 /*** TO BE DONE 5.0 START ***/
 
-	if(my_timegm(&since_tm) > stat_p->st_mtime) // if(difftime(my_timegm(&since_tm),stat_p->st_mtime) == 0)
+	if(my_timegm(&since_tm) > stat_p->st_mtime)
         http_method = METHOD_NOT_CHANGED;
     else
 		http_method = METHOD_CONDITIONAL;

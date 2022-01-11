@@ -79,8 +79,7 @@ void run_webserver(const char *const port_as_str, char *www_root, const int *con
 	   fail_errno("Cannot change the root directory");
 
     create_listening_socket(port_as_str);
-	// if(geteuid() == 0) // there's an assert that check that in function drop_priviledges()
-	    drop_privileges();
+	drop_privileges();
 
 /*** TO BE DONE 5.0 END ***/
 
