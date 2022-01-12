@@ -220,7 +220,7 @@ void send_response(int client_fd, int response_code, int cookie,
             /*** set permanent cookie in order to identify this client ***/
 /*** TO BE DONE 5.0 START ***/
 
-	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: id=%d%s;", cookie, COOKIE_EXPIRE); // ok
+	sprintf(http_header + strlen(http_header), "\r\nSet-Cookie: UserID=%d%s;", cookie, COOKIE_EXPIRE); // ok
 
 /*** TO BE DONE 5.0 END ***/
 
