@@ -382,7 +382,7 @@ void manage_http_requests(int client_fd
 				 *** and possibly add METHOD_CONDITIONAL flag to http_method
 /*** TO BE DONE 5.0 START ***/
 
-	option_name = strtok(http_option_line, ": "); // option_line parsing and storing in option_name
+	option_name = strtok(http_option_line, ": "); // http_option_line parsing and storing in option_name
 	option_val = strtok_r(NULL, "GMT", &strtokr_save);
 
 	if(strcmp(option_name, "If-Modified-Since") == 0)
