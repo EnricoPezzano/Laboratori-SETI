@@ -1,4 +1,4 @@
-declare pippo;
+#declare pippo;
 #!/bin/bash #è una direttiva 
 # "#!" è detto shebang, /bin/bash indica l'interprete di comandi usato, in questo caso proprio bash
 
