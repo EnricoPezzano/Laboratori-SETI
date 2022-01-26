@@ -1,4 +1,5 @@
-#!/bin/bash #è una direttiva 
+#!/bin/bash 
+#è una direttiva 
 # "#!" è detto shebang, /bin/bash indica l'interprete di comandi usato, in questo caso proprio bash
 
 # 1. Leggere dal file throughput.dat (generato mediante una interazione con il server 
