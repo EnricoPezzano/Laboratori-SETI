@@ -33,7 +33,7 @@
 # 2) dichiaro il resto delle variabili (array 2 elem)
 #	che serviranno (N1, N2, T1, T2, L0, Bandw, Delay)';
 
-	declare -a arra=("TCP" "UDP")
+	declare -a arra=("tcp" "udp")
 	declare  N1
 	declare  N2
 	declare  Th_n1
