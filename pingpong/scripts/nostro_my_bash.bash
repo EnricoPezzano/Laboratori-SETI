@@ -49,7 +49,7 @@ declare delayn2=$(bc -l <<< "($n2tcp/$mediantcp2)")
 # solo variabili di tipo intero o di tipo stringa). Si suggerisce quindi di lanciare l'applicazione bc (vedi 
 # man bc) che permette di effettuare calcoli in virgola mobile con precisione arbitrariamente predefinita (e di 
 # effettuare calcoli con una precisione di almeno 9 cifre decimali).
-L=$(bc <<< "scale=20;var1=${DelayMin}*${N2};var2=${DelayMax}*${N1};var3=var1-var2;var3/${Denominatore}")
+L0=$(bc <<< "scale=20;var1=${DelayMin}*${N2};var2=${DelayMax}*${N1};var3=var1-var2;var3/${Denominatore}")
 B=$(bc <<< "scale=20;var1=${N2}-${N1};var1/${Denominatore}")
 
 echo bandwiwidth: $B
