@@ -2,76 +2,107 @@
 #...è una direttiva 
 # "#!" è detto shebang, /bin/bash indica l'interprete di comandi usato, in questo caso proprio bash
 
-# 1. Leggere dal file throughput.dat (generato mediante una interazione con il server 
-# Pong su webdev.disi.unige.it) la prima e l'ultima riga ed estrarre i valori N1 e N2,
-# T(N1) e T(N2). Si vedano i comandi head e tail per leggere le righe dal file.
-#lillo
+# 1) devo raccogliere i dati sia per tcp che udp 
+#		dal file *_throughput.dat
+#		--> declare -a arra=("tcp" "udp")
+#		--> readonly TcpDataFilename && UdpDataFilename;
+
+#	2) dichiaro il resto delle variabili (array 2 elem) che 
+#		serviranno (N1, N2, T1, T2, L0, Bandw, Delay)
+#
+#		!! (cut -d " " -fX) -f è un po l index dell array di str;
+#
+#	3) eseguo tutte le seguenti OP sia per arra[tcp] che udp;
+#
+#	4) ottengo msg_size e throughput MEDIO
+#		sia per head che tail;
+#
+#	5) usando la formula inversa (Delay = msg_size/T) calcolo 
+#		DelayMin & DelayMax
+#
+#		!! use byte calculator (man bc);
+#
+#	6) Usando formule aulaweb calcolo L0 e Bandw;
+#
+#	7) Creo grafici tcp e udp in scala log con Gnuplot;
+
+	set -e 
+#1) Raccolgo i dati sia per tcp che udp dal file 
+#	*_throughput.dat
+#	--> declare -a arra=("tcp" "udp");
+# 2) dichiaro il resto delle variabili (array 2 elem)
+#	che serviranno (N1, N2, T1, T2, L0, Bandw, Delay)';
+
+	declare -a arra=("TCP" "UDP")
+	declare  N1
+	declare  N2
+	declare  Th_n1
+	declare  Th_n2
 
 
+	#3) eseguo tutte le seguenti OP sia per arra[tcp] che udp;
+	#4) ottengo msg_size e throughput MEDIO sia per head che tail;
+
+	for index in "${arra[@]}"
+	do
+		N1=$(head -n 1 ../data/"${index}"_throughput.dat | cut -d ' ' -f1)
+		N2=$(tail -n 1 ../data/"${index}"_throughput.dat | cut -d ' ' -f1)
+
+		Th_n1=$(head -n 1 ../data/"${index}"_throughput.dat | cut -d ' ' -f3)
+		Th_n2=$(tail -n 1 ../data/"${index}"_throughput.dat | cut -d ' ' -f3)
+
+	#The -e option is used to enable echo's interpretation
+	#of additional instances of the newline character as 
+	#well as the interpretation of other special characters,
+	#such as a horizontal tab, which is represented by \t.
+	echo "$index":
+	echo size min: "$N1" 
+	echo size max: "$N2"
+	echo throughput min: "$Th_n1"
+	echo throughput max: "$Th_n2"
 
 
+	#5) usando la formula inversa (Delay = msg_size/T) calcolo 
+	#	DelayMin & DelayMax
 
-
-# 2. Ricavare i parametri B e L0 che caratterizzano la formula del modello Banda-Latenza.
-# Attenzione: per il calcolo dei valori in floating point non si può usare direttamente bash (che definisce 
-# solo variabili di tipo intero o di tipo stringa). Si suggerisce quindi di lanciare l'applicazione bc (vedi 
-# man bc) che permette di effettuare calcoli in virgola mobile con precisione arbitrariamente predefinita (e di 
-# effettuare calcoli con una precisione di almeno 9 cifre decimali).
-#mio anno scorso
-#calcolo le costanti
-echo 'calcolo costanti'
-# il delay è legato al thorughtput medio e al numero di byte dalla formula T*D=N -> D=N/T
-DelayMin=$(bc <<<"scale=20;var1=${N1};var2=${T1};var1 / var2")
-DelayMax=$(bc <<<"scale=20;var1=${N2};var2=${T2};var1 / var2")
-Denominatore=$(bc <<< "scale=20;${DelayMax}-${DelayMin}")
-
-L0=$(bc <<< "scale=20;var1=${DelayMin}*${N2};var2=${DelayMax}*${N1};var3=var1-var2;var3/${Denominatore}")
-B=$(bc <<< "scale=20;var1=${N2}-${N1};var1/${Denominatore}")
-
-echo bandwiwidth: $B
-echo latency: $L0
-#stampa i valori Numero_byte e Latenza sul file .dat
-echo 'stampo i valori Numero_byte e Latenza sul file .dat'
-N_LINEE_FILE=$(wc -l "${DataDir}/${ProtocolName}_throughput.dat" | cut -d ' ' -f1)
-NUMERO_LINEA=1
-
-while [ $NUMERO_LINEA -lt $N_LINEE_FILE ]
-do
-    N=$(sed "${NUMERO_LINEA}q;d" ${DataDir}/${ProtocolName}_throughput.dat | cut -d' ' -f1)
-    D=$(bc <<<"scale=20;var1=${L};var2=${N};var3=${B};var1 + (var2 / var3)")
-    echo $N $D
-    printf "$N $D \n" >> ${OutputDatFile}
-    ((NUMERO_LINEA++))
-done
-
-echo ridimensiono costanti:
-L0=$(bc <<< "scale=2;$L")
-B0=$(bc <<< "scale=2;$B")
-
-echo "L0=$L0"
-echo "B0=$B0"
-
-
-# 3. Realizzare due grafici (uno per TCP e uno per UDP) come quelli riportati nelle due figure; dalla 
-# documentazione di gnuplot (oppure dagli script ...) ricavate i comandi per disegnare curve in scala logaritmica.
-# Suggerimento: il modo più semplice per rappresentare la formula Banda-Latenza in gnuplot dovrebbe 
-# essere mediante la definizione di una funzione, per esempio:
-#   lbf(x) = x / ( $myL + x / $myB )
-#       plot lbf(x) title "Latency-Bandwidth model with L=$myL and B=$myB" with linespoints
-#twingo
-gnuplot <<-eNDgNUPLOTcOMMAND
-    set term png size 900,700
-    
-    set logscale x 2
-	set logscale y 10
-	set xlabel "msg size (B)"
-	set ylabel "throughput (KB/s)"
+	#	!! use byte calculator (man bc);
 	
-	set output "../data/$OutputPngFile"
-	plot "../data/${OutputDatFile}" using 1:2 title "Latency-Bandwidth model with L=${Latenza} and B=${Banda}"\
-	    with linespoint, \
-	     "../data/${InputFile}" using 1:3 title "${ProtocolName} ping-pong Throughput (average)" \
+	declare  DelayMin
+	declare  DelayMax
+	DelayMin=$(bc <<<"scale=10; var1=${N1}; var2=${Th_n1}; var1/var2")
+	DelayMax=$(bc <<<"scale=10; var1=${N2}; var2=${Th_n2}; var1/var2")
+
+	echo DelayMin: "$DelayMin"
+	echo DelayMax: "$DelayMax"
+
+	#6) Usando formule aulaweb calcolo L0 e Bandw
+	# Bandw = (N2 - N1) / ( D(N2) - D(N1) ); 
+	declare Bandw 
+	declare L0
+	Bandw=$(bc <<<"scale=10; n2=${N2}; n1=${N1}; dmin=${DelayMin}; dmax=${DelayMax}; ((n2-n1)/(dmax-dmin))")
+	L0=$(bc <<< "scale=10; n2=${N2}; n1=${N1}; dmin=${DelayMin}; dmax=${DelayMax}; ( (dmin*n2) - (dman*n1) ) / (n2-n1)")
+	
+	echo Banda: "$Bandw"
+	echo Latenza 0: "$L0"
+
+
+	#7) Elimino old files && Grafico;
+	if test -f "${index}_banda_latenza.png"; then rm "${index}_banda_latenza.png"
+	fi
+
+	#creo il nuovo grafico
+	gnuplot <<-eNDgNUPLOTcOMMAND
+		set term png size 900, 700 
+		set output "../data/${index}_banda_latenza.png"
+		set logscale y 10
+		set logscale x 2
+		set xlabel "msg size (B)"
+		set ylabel "throughput (KB/s)"
+		lbf(x) = x / ($L0 + x / $Bandw)
+		plot "../data/${index}_throughput.dat" using 1:2 title "${index} ping-pong average Throughput" \
+			with linespoints, \
+		lbf(x) title "Latency-Bandwidth model with L=${L0} and B=${Bandw}" \
 			with linespoints
-	clear
-eNDgNUPLOTcOMMAND
-    echo 'grafico creato e disponibile nella cartella: data'
+		clear
+	eNDgNUPLOTcOMMAND
+done
