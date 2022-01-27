@@ -1,6 +1,8 @@
-#!/bin/bash 
-#...è una direttiva 
-# "#!" è detto shebang, /bin/bash indica l'interprete di comandi usato, in questo caso proprio bash
+#!/bin/bash
+if [[ $# != 0 ]]; then
+	printf "\nError: Didn't expected parameters\n\n";
+	exit 1;
+fi
 
 set -e
 #The -e option is used to enable echo's interpretation
@@ -9,17 +11,14 @@ set -e
 	#such as a horizontal tab, which is represented by \t.
 
 #raccolgo i dati dai rispettivi file sia per tcp che per udp
-declare -a array=("tcp" "udp")
+declare -a protocol=("tcp" "udp")
 declare  N1
 declare  N2
 declare  Th_n1
 declare  Th_n2
 
-
-	
-	
 #ciclo for "doppio" per le operazioni ripetute sia per tcp che per udp
-for index in "${array[@]}"
+for index in "${protocol[@]}"
 do
     #ottengo msg_size e throughput MEDIO sia per head che tail;
     N1=$(head -n 1 ../data/"${index}"_throughput.dat | cut -d ' ' -f1) #cut -d ' ' -fn è come se fosse "l'indice" dell'array
@@ -61,7 +60,8 @@ do
 
     #7) Elimino old files && Grafico;
     #	7) Creo grafici tcp e udp in scala log con Gnuplot;
-    if test -f "${index}_banda_latenza.png"; then rm "${index}_banda_latenza.png"
+    if test -f "${index}_banda_latenza.png"; then
+        rm "${index}_banda_latenza.png"
     fi
 
     #creo il nuovo grafico
@@ -78,6 +78,9 @@ do
         lbf(x) title "Latency-Bandwidth model with L=${L0} and B=${Bandw}" \
             with linespoints
         clear
-    eNDgNUPLOTcOMMAND
+eNDgNUPLOTcOMMAND
+#...or simply don't indent the end token:
 
 done
+xdg-open throughput.png, tcp_banda_latenza, udp_banda_latenza &
+#una volta finito di controllare il codice, rifai test e grafici su ubuntu
