@@ -39,7 +39,6 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
     /*** write msg_no at the beginning of the message buffer ***/
 /*** TO BE DONE START ***/
 
-//////////////////////////////////////////////// --> https://www.geeksforgeeks.org/udp-server-client-implementation-c/
 	if(sprintf(message, "%d", msg_no) < 0)
 		fail_errno("Error: sprintf() didn't write the message at the beginning of the message buffer.");
 
@@ -58,23 +57,20 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
 	/*** Send the message through the socket (non blocking mode) ***/
 /*** TO BE DONE START ***/
 
-	// do { // vers_mire
-	// 	sent_bytes = write(ping_socket, message, msg_size);
-	// }while (sent_bytes < 0);
-
-			sent_bytes = send(ping_socket, message, msg_size, MSG_DONTWAIT); 
-			if(sent_bytes == -1) //fail_errno...
+//MANCA QUESTO------------------------------------------------------------------------------------------------------------------------
+	sent_bytes = send(ping_socket, message, msg_size, MSG_DONTWAIT); 
+	if(sent_bytes == -1) //fail_errno...
 	// // if(send(ping_socket, message, msg_size, MSG_DONTWAIT) == -1) //mi piace di più questo
 	// // if(write(ping_socket, message, msg_size) == -1)
 	//// if(nonblocking_write_all(ping_socket, /*&*/message, msg_size) == -1) //(int fd, const void *ptr, size_t n)
 		fail_errno("nonblocking_write_all() error!");
-	// sent_bytes = msg_size;
+
 
 /*** TO BE DONE END ***/
 
 	/*** Receive answer through the socket (non blocking mode, with timeout) ***/
 /*** TO BE DONE START ***/
-
+//E QUESTO------------------------------------------------------------------------------------------------------------------------
 	// // da rivedere
 	// /* Receive answer through the socket (blocking) */ //tcp del prof
 	// for (int offset = 0; (offset + (recv_bytes = recv(ping_socket, answer_buffer + offset, sent_bytes - offset, MSG_DONTWAIT))) < msg_size; offset += recv_bytes) {
@@ -162,7 +158,7 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
 
 	gai_hints.ai_family = AF_INET;
 	gai_hints.ai_socktype = SOCK_DGRAM;
-	gai_hints.ai_protocol = IPPROTO_UDP; // prova con 17->IPPROTO_UDP
+	gai_hints.ai_protocol = IPPROTO_UDP;
 	gai_hints.ai_flags = AI_PASSIVE;
 
 
@@ -174,7 +170,6 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
     /*** change ping_socket behavior to NONBLOCKing using fcntl() ***/
 /*** TO BE DONE START ***/
 
-	//da studiare sul man
 	if(fcntl(ping_socket, F_SETFL, O_NONBLOCK) == -1)
 		fail_errno("Error: fcntl couldn't change the socket behaviour to non-blocking.");
 
@@ -182,7 +177,7 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
 
     /*** call getaddrinfo() in order to get Pong Server address in binary form ***/
 /*** TO BE DONE START ***/
-
+//E QUESTO------------------------------------------------------------------------------------------------------------------------
 	// è necessario fare questa cosa in 2 righe invece di una?
 	gai_rv = getaddrinfo(pong_addr, pong_port, &gai_hints, &pong_addrinfo);
 	if(gai_rv < 0)
@@ -204,11 +199,6 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
 
     /*** connect the ping_socket UDP socket with the server ***/
 /*** TO BE DONE START ***/
-
-	// struct sockaddr_in *ipv4; // vers_mire
-	// ipv4 = (struct sockaddr_in *)pong_addrinfo->ai_addr;
-	// if(connect(ping_socket,  (struct sockaddr *)pong_addrinfo->ai_addr, sizeof(struct sockaddr_in))<0)
-	// 	fail_errno("connect");
 
 	if (connect(ping_socket, pong_addrinfo->ai_addr, pong_addrinfo->ai_addrlen) == -1)
 		fail_errno("Error: connect() couldn't connect the UDP socket with the server.");
@@ -252,16 +242,13 @@ int main(int argc, char *argv[])
 	gai_hints.ai_family = AF_INET;    /* Allow IPv4 or IPv6 */
 	gai_hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
 	gai_hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
-	gai_hints.ai_protocol = IPPROTO_TCP; /* 0 = Any protocol */ // prova con IPPROTO_TCP
-	// gai_hints.ai_canonname = NULL;
-	// gai_hints.ai_addr = NULL;
-	// gai_hints.ai_next = NULL;
+	gai_hints.ai_protocol = IPPROTO_TCP;
 
 /*** TO BE DONE END ***/
 
     /*** call getaddrinfo() in order to get Pong Server address in binary form ***/
 /*** TO BE DONE START ***/
-
+//E QUESTO------------------------------------------------------------------------------------------------------------------------
 // anche qui, è necessario fare questa cosa in 2 righe invece di una?
 	gai_rv = getaddrinfo(argv[1], argv[2], &gai_hints, &server_addrinfo);
 	if (gai_rv != 0) //da errore qui
@@ -275,10 +262,6 @@ int main(int argc, char *argv[])
 
     /*** create a new TCP socket and connect it with the server ***/
 /*** TO BE DONE START ***/
-
-	// ask_socket = socket(AF_INET, SOCK_STREAM, 0); // vers_mire (secondo me è meglio la nostra)
-	// if(ask_socket<0) fail_errno("Error socket");
-	// if(connect(ask_socket, (struct sockaddr *) ipv4, sizeof(struct sockaddr_in))<0) fail_errno("Error connect");
 
 	ask_socket = socket(server_addrinfo->ai_family, server_addrinfo->ai_socktype, server_addrinfo->ai_protocol);
 		if (ask_socket == -1)
@@ -295,7 +278,7 @@ int main(int argc, char *argv[])
 
     /*** Write the request on the TCP socket ***/
 /** TO BE DONE START ***/
-	// strlen(request) ?? -> secondo me è meglio come abbiamo fatto noi
+//E QUESTO---------------------------------------------------------prova a passare anche i flags---------------------------------------------------------------
 	if(write(ask_socket, request, server_addrinfo->ai_addrlen/*, server_addrinfo->ai_flags*/) == -1) //(int fd, const void *buf, size_t count);
 		fail_errno("Error: write()'s execution failed.");
 

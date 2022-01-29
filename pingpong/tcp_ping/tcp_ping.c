@@ -56,13 +56,9 @@ if(clock_gettime(CLOCK_TYPE, &send_time) == -1)
     /* Send the message through the socket (blocking)  */
 /* TO BE DONE START */
 
-if(blocking_write_all(tcp_socket, message, msg_size) == -1) //(int fd, const void *ptr, size_t n)
+if(blocking_write_all(tcp_socket, message, msg_size) == -1)
 	fail_errno("blocking_write_all() error: nothing has been written.");
 sent_bytes = msg_size;
-// if(write(tcp_socket, message, msg_size) == -1)
-//   fail_errno("TCP Ping could not send a message");
-//  sent_bytes = msg_size;
-
 
 /* TO BE DONE END */
 
@@ -76,7 +72,6 @@ sent_bytes = msg_size;
     /* Store the current time in recv_time */
 /* TO BE DONE START */
 
-//DA FARE TEST SIA CON CLOCK_REALTIME CHE CON CLOCK_MONOTONIC
 if(clock_gettime(CLOCK_TYPE, &recv_time) == -1)
 	fail_errno("clock_settime() error!");
 
@@ -119,7 +114,6 @@ int main(int argc, char **argv)
 	memset(&gai_hints, 0, sizeof gai_hints);
 /* TO BE DONE START */
 
-//DA RIVEDERE-----------------------------------------
 	gai_hints.ai_family = AF_INET;    /* Allow IPv4 or IPv6 */
 	gai_hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
 	//gai_hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
@@ -148,7 +142,6 @@ if (gai_rv != 0){
     /* create a new TCP socket and connect it with the server */
 /* TO BE DONE START */
 
-//controlla
 tcp_socket = socket(server_addrinfo->ai_family, server_addrinfo->ai_socktype, server_addrinfo->ai_protocol);
 if (tcp_socket == -1)
 	fail_errno("Error creating socket.");
@@ -185,7 +178,6 @@ if(write(tcp_socket, &request, strlen(request)) == -1)
 //se controlli più di 2 caratteri, aggiungi il terminatore
 	if(strncmp("OK", answer,2))
 		fail_errno("Error: answer received is not OK");
-	else
 
 /* TO BE DONE END */
 
