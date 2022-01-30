@@ -162,7 +162,7 @@ command_t *parse_cmd(char * const cmdstr)
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
 				if (getenv(tmp+1)==NULL)																								//funziona?
-					tmp='\0';																															//asterisco o meno?
+					tmp="\0";																															//asterisco o meno?
 				else
 					tmp=getenv(tmp+1);																										//asterisco o meno?
 				/*** TO BE DONE END ***/
@@ -414,8 +414,9 @@ int main()
 		 * The memory area must be allocated (directly or indirectly) via malloc.
 		 */
 		/*** TO BE DONE START ***/
-		if (getcwd(pwd, PATH_MAX)==NULL)																						//dimensione di PATH_MAX = 4096 ... getcwd indirettamente fa la malloc
-			fatal_errno("getcwd");																										//errore in cwd
+		pwd = my_malloc(4096);
+		if (getwd(pwd) == NULL)																						//dimensione di PATH_MAX = 4096 ... getcwd indirettamente fa la malloc
+			fatal_errno("getwd");																										//errore in cwd
 		/*** TO BE DONE END ***/
 		pwd = my_realloc(pwd, strlen(pwd) + prompt_suffix_len + 1);
 		strcat(pwd, prompt_suffix);
