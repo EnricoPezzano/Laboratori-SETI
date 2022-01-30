@@ -58,11 +58,9 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
 /*** TO BE DONE START ***/
 
 //MANCA QUESTO------------------------------------------------------------------------------------------------------------------------
-	sent_bytes = send(ping_socket, message, msg_size, MSG_DONTWAIT); 
-	// if(sent_bytes == -1) //fail_errno...
-	// // if(send(ping_socket, message, msg_size, MSG_DONTWAIT) == -1) //mi piace di più questo
-	// // if(write(ping_socket, message, msg_size) == -1)
-	if(nonblocking_write_all(ping_socket, /*&*/message, msg_size) == -1) //(int fd, const void *ptr, size_t n)
+	sent_bytes = nonblocking_write_all(ping_socket, message, msg_size);
+	// if(send(ping_socket, message, msg_size, MSG_DONTWAIT) == -1)
+	if(sent_bytes == -1)
 		fail_errno("nonblocking_write_all() error!");
 
 
