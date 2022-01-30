@@ -286,7 +286,7 @@ void wait_for_children()
     }
     else if ( WIFSIGNALED(status)) {																						//qui ci entro se il filgio è stato interrotto da un segnale
       int num = WTERMSIG(status);
-			string processName;
+			char* processName = my_malloc(4096);
 			sprintf (processName, "/proc/%d/cmdline", pid);														//DA CONTROLLARE QUANDO COMPILIAMO
       printf("Process %s with ID %d exited due to receiving signal %d\n", processName, pid,  num);
     }
