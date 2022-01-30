@@ -89,6 +89,7 @@ void free_command(command_t * const c)
 {
 	assert(c==0 || c->n_args==0 || (c->n_args > 0 && c->args[c->n_args] == 0)); /* sanity-check: if c is not null, then it is either empty (in case of parsing error) or its args are properly NULL-terminated */
 	/*** TO BE DONE START ***/
+		free(c);																																		//basta così? la free è sufficiente?
 	/*** TO BE DONE END ***/
 }
 
@@ -96,6 +97,7 @@ void free_line(line_t * const l)
 {
 	assert(l==0 || l->n_commands>=0); /* sanity-check */
 	/*** TO BE DONE START ***/
+		free(l);																																		//basta così? la free è sufficiente?
 	/*** TO BE DONE END ***/
 }
 
@@ -234,6 +236,17 @@ void wait_for_children()
 	 * Similarly, if a child is killed by a signal, then you should print a message specifying its PID, signal number and name.
 	 */
 	/*** TO BE DONE START ***/
+	int status;																																		//qui ci salvo exit status
+	while ((int pid = wait (&status))!=-1) {																			//faccio wait finchè non ci sono più figli da aspettare. Quando non ci sono più figli wait() ritorna -1
+		if (WIFEXITED(status) != 0) {
+        int num = WEXITSTATUS(status);																					//qui ci entro se exit-status!=0
+        printf("Exited with status!=0 : %d\n", num);
+    }
+    else if ( WIFSIGNALED(status)) {																						//qui ci entro se il filgio è stato interrotto da un segnale
+        int num = WTERMSIG(status);
+        printf("Exited due to receiving signal %d\n", num);
+    }
+	}																																							//bisogna stampare pid e nomi segnali e capire se c'è qualcosa di ridondante all'inizio
 	/*** TO BE DONE END ***/
 }
 
@@ -256,6 +269,15 @@ void run_child(const command_t * const c, int c_stdin, int c_stdout)
 	 * (printing error messages in case of failure, obviously)
 	 */
 	/*** TO BE DONE START ***/
+		if(pid_t pid = fork() == -1) 																								//posso fare una cosa del genere o devo dividere in due comandi separati?
+			fatal_errno("fork");
+		if (pid == 0) {																															//sono nel processo figlio
+			c_stdin = 0;																															//sistremo input
+			c_stdout = 1;																															//sistemo output
+			if (execvp (c->args[0], c->args) == -1)																		//posso fare una cosa del genere o devo dividere in due comandi separati?
+				fatal_errno("execvp");
+			//IMPORTANTE																															//DEVO FARE EXIT() O EXEC() FA TUTTO DA SOLA?
+		}
 	/*** TO BE DONE END ***/
 }
 
@@ -340,7 +362,7 @@ int main()
 		 * The memory area must be allocated (directly or indirectly) via malloc.
 		 */
 		/*** TO BE DONE START ***/
-		if (getcwd(pwd, PATH_MAX)==NULL)																					//dimensione di PATH_MAX = 4096
+		if (getcwd(pwd, PATH_MAX)==NULL)																						//dimensione di PATH_MAX = 4096 ... getcwd indirettamente fa la malloc
 			fatal_errno("getcwd");																										//errore in cwd
 		/*** TO BE DONE END ***/
 		pwd = my_realloc(pwd, strlen(pwd) + prompt_suffix_len + 1);
