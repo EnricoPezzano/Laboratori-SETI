@@ -27,7 +27,7 @@ do
     Th_n1=$(head -n 1 ../data/"${index}"_throughput.dat | cut -d ' ' -f3)
     Th_n2=$(tail -n 1 ../data/"${index}"_throughput.dat | cut -d ' ' -f3)
 
-    echo \
+    echo  
     echo ----"$index"----
     echo Size Min: "$N1" 
     echo Size Max: "$N2"
@@ -78,6 +78,6 @@ eNDgNUPLOTcOMMAND
 #...or simply don't indent the end token:
 
 done
-xdg-open throughput.png 
-xdg-open tcp_banda_latenza.png
-xdg-open udp_banda_latenza.png
+xdg-open ../data/throughput.png 
+xdg-open ../data/tcp_banda_latenza.png
+xdg-open ../data/udp_banda_latenza.png
