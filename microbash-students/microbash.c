@@ -162,9 +162,9 @@ command_t *parse_cmd(char * const cmdstr)
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
 				if (getenv(*tmp+1)==NULL)																								//funziona?
-					*tmp='\0';
+					tmp='\0';																															//asterisco o meno?
 				else
-					*tmp=getenv(*tmp+1);
+					tmp=getenv(*tmp+1);																										//asterisco o meno?
 				/*** TO BE DONE END ***/
 			}
 			result->args[result->n_args++] = my_strdup(tmp);
@@ -225,6 +225,39 @@ check_t check_cd(const line_t * const l)
 	 * and return CHECK_OK if everything is ok, CHECK_FAILED otherwise
 	 */
 	/*** TO BE DONE START ***/
+
+	/*	for (int i=0; i < l->n_commands; i++)
+			if (strncmp(l->commands->args[0], "cd", 2))
+				//trovato
+	*/
+
+	bool is_here = false;
+  int cont = 0;
+  for (int i=0; i< l->n_commands; i++)
+  {
+      if(strncmp(l->commands->args[cont], "cd", 2)
+         is_here = true;
+			else
+      	cont +=l->commands->n_args;
+  }
+	if (!is_here)
+			return CHECK_OK;
+
+	if (l->n_commands > 1)
+		return CHECK_FAILED;
+
+	if (l->commands->n_args != 1)
+		return CHECK_FAILED;
+
+	if (l->commands->args[1] == '<' || l->commands->args[1] == '>')
+		return CHECK_FAILED;
+
+
+
+	/*	if(strncmp("cd", l->commands[0]->args[0]),2)
+			printf("error")
+	*/
+
 	/*** TO BE DONE END ***/
 	return CHECK_OK;
 }
@@ -256,6 +289,13 @@ void redirect(int from_fd, int to_fd)
 	 * That is, use dup/dup2/close to make to_fd equivalent to the original from_fd, and then close from_fd
 	 */
 	/*** TO BE DONE START ***/
+		if (from_fd!=NO_REDIR){
+			if(dup2(from_fd, to_fd) == -1){
+				close(to_fd);
+				fatal_errno("dup2");
+			}
+			close (from_fd)
+		}
 	/*** TO BE DONE END ***/
 }
 
@@ -272,8 +312,8 @@ void run_child(const command_t * const c, int c_stdin, int c_stdout)
 		if(pid_t pid = fork() == -1) 																								//posso fare una cosa del genere o devo dividere in due comandi separati?
 			fatal_errno("fork");
 		if (pid == 0) {																															//sono nel processo figlio
-			c_stdin = 0;																															//sistremo input
-			c_stdout = 1;																															//sistemo output
+			c_stdin = STDIN_FILENO;																										//sistremo input
+			c_stdout = STDOUT_FILENO;																									//sistemo output
 			if (execvp (c->args[0], c->args) == -1)																		//posso fare una cosa del genere o devo dividere in due comandi separati?
 				fatal_errno("execvp");
 			//IMPORTANTE																															//DEVO FARE EXIT() O EXEC() FA TUTTO DA SOLA?
