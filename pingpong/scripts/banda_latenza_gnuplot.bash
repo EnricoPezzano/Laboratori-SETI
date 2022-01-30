@@ -20,7 +20,7 @@ declare  Th_n2
 #ciclo for "doppio" per le operazioni ripetute sia per tcp che per udp
 for index in "${protocol[@]}"
 do
-    #ottengo msg_size e throughput MEDIO sia per head che tail;
+    #ottengo msg_size e throughput medio sia per head che tail;
     N1=$(head -n 1 ../data/"${index}"_throughput.dat | cut -d ' ' -f1) #cut -d ' ' -fn è come se fosse "l'indice" dell'array
     N2=$(tail -n 1 ../data/"${index}"_throughput.dat | cut -d ' ' -f1)
 
@@ -29,37 +29,33 @@ do
 
 
     echo "$index":
-    echo size min: "$N1" 
-    echo size max: "$N2"
-    echo throughput min: "$Th_n1"
-    echo throughput max: "$Th_n2"
+    echo Size Min: "$N1" 
+    echo Size Max: "$N2"
+    echo Throughput Min: "$Th_n1"
+    echo Throughput Max: "$Th_n2"
 
 
-    #5) usando la formula inversa (Delay = msg_size/T) calcolo DelayMin & DelayMax
+    #tramite la formula inversa (Delay = msg_size/T) calcolo delay_min e delay_max
+    declare delay_min
+    declare delay_max
+    delay_min=$(bc <<<"scale=10; msg_size=${N1}; t=${Th_n1}; msg_size/t")
+    delay_max=$(bc <<<"scale=10; msg_size=${N2}; t=${Th_n2}; msg_size/t")
 
+    echo Delay Min: "$delay_min"
+    echo Delay Max: "$delay_max"
+
+    #tramite le formule di aulaweb calcolo latency0 e band_width
+    #band_width = (N2 - N1) / ( D(N2) - D(N1) ); 
+    declare band_width 
+    declare latency0
+    band_width=$(bc <<<"scale=10; n2=${N2}; n1=${N1}; dmin=${delay_min}; dmax=${delay_max}; ((n2-n1)/(dmax-dmin))")
+    latency0=$(bc <<< "scale=10; n2=${N2}; n1=${N1}; dmin=${delay_min}; dmax=${delay_max}; ( (dmin*n2) - (dman*n1) ) / (n2-n1)")
     
-    declare  DelayMin
-    declare  DelayMax
-    DelayMin=$(bc <<<"scale=10; var1=${N1}; var2=${Th_n1}; var1/var2")
-    DelayMax=$(bc <<<"scale=10; var1=${N2}; var2=${Th_n2}; var1/var2")
-
-    echo DelayMin: "$DelayMin"
-    echo DelayMax: "$DelayMax"
-
-    #6) Usando formule aulaweb calcolo L0 e Bandw
-    # Bandw = (N2 - N1) / ( D(N2) - D(N1) ); 
-    #	6) Usando formule aulaweb calcolo L0 e Bandw;
-    declare Bandw 
-    declare L0
-    Bandw=$(bc <<<"scale=10; n2=${N2}; n1=${N1}; dmin=${DelayMin}; dmax=${DelayMax}; ((n2-n1)/(dmax-dmin))")
-    L0=$(bc <<< "scale=10; n2=${N2}; n1=${N1}; dmin=${DelayMin}; dmax=${DelayMax}; ( (dmin*n2) - (dman*n1) ) / (n2-n1)")
-    
-    echo Banda: "$Bandw"
-    echo Latenza 0: "$L0"
+    echo Banda: "$band_width"
+    echo Latenza 0: "$latency0"
 
 
-    #7) Elimino old files && Grafico;
-    #	7) Creo grafici tcp e udp in scala log con Gnuplot;
+    #se trovo grafici vecchi, li sovrascrivo
     if test -f "${index}_banda_latenza.png"; then
         rm "${index}_banda_latenza.png"
     fi
@@ -72,10 +68,10 @@ do
         set logscale x 2
         set xlabel "msg size (B)"
         set ylabel "throughput (KB/s)"
-        lbf(x) = x / ($L0 + x / $Bandw)
+        lbf(x) = x / ($latency0 + x / $band_width)
         plot "../data/${index}_throughput.dat" using 1:2 title "${index} ping-pong average Throughput" \
             with linespoints, \
-        lbf(x) title "Latency-Bandwidth model with L=${L0} and B=${Bandw}" \
+        lbf(x) title "Latency-Bandwidth model with L=${latency0} and B=${band_width}" \
             with linespoints
         clear
 eNDgNUPLOTcOMMAND
@@ -83,4 +79,3 @@ eNDgNUPLOTcOMMAND
 
 done
 xdg-open throughput.png, tcp_banda_latenza, udp_banda_latenza &
-#una volta finito di controllare il codice, rifai test e grafici su ubuntu
