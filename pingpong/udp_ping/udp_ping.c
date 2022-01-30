@@ -222,8 +222,7 @@ int main(int argc, char *argv[])
 
     /*** call getaddrinfo() in order to get Pong Server address in binary form ***/
 /*** TO BE DONE START ***/
-//E QUESTO------------------------------------------------------------------------------------------------------------------------
-// anche qui, è necessario fare questa cosa in 2 righe invece di una?
+
 	// gai_rv = getaddrinfo(argv[1], argv[2], &gai_hints, &server_addrinfo);
 	if (getaddrinfo(argv[1], argv[2], &gai_hints, &server_addrinfo) != 0) //da errore qui
 		fail_errno("getaddrinfo() error!");
@@ -253,7 +252,7 @@ int main(int argc, char *argv[])
     /*** Write the request on the TCP socket ***/
 /** TO BE DONE START ***/
 //E QUESTO---------------------------------------------------------prova a passare anche i flags---------------------------------------------------------------
-	if(write(ask_socket, request, server_addrinfo->ai_addrlen/*, server_addrinfo->ai_flags*/) == -1) //(int fd, const void *buf, size_t count);
+	if(write(ask_socket, request, server_addrinfo->ai_addrlen, server_addrinfo->ai_flags) == -1) //(int fd, const void *buf, size_t count);
 		fail_errno("Error: write()'s execution failed.");
 
 /*** TO BE DONE END ***/
