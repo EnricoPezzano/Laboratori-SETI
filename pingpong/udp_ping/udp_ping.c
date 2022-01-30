@@ -57,9 +57,10 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
 	/*** Send the message through the socket (non blocking mode) ***/
 /*** TO BE DONE START ***/
 
-//MANCA QUESTO------------------------------------------------------------------------------------------------------------------------
+	// if(send(ping_socket, message, msg_size, MSG_DONTWAIT) == -1) //old...
+
+	//devo tener traccia dei byte effettivamente mandati
 	sent_bytes = nonblocking_write_all(ping_socket, message, msg_size);
-	// if(send(ping_socket, message, msg_size, MSG_DONTWAIT) == -1)
 	if(sent_bytes == -1)
 		fail_errno("nonblocking_write_all() error!");
 
@@ -135,7 +136,6 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
 	gai_hints.ai_protocol = IPPROTO_UDP;
 	gai_hints.ai_flags = AI_PASSIVE;
 
-
 /*** TO BE DONE END ***/
 
 	if ((ping_socket = socket(gai_hints.ai_family, gai_hints.ai_socktype, gai_hints.ai_protocol)) == -1)
@@ -151,8 +151,7 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
 
     /*** call getaddrinfo() in order to get Pong Server address in binary form ***/
 /*** TO BE DONE START ***/
-//E QUESTO------------------------------------------------------------------------------------------------------------------------
-	// è necessario fare questa cosa in 2 righe invece di una?
+
 	// gai_rv = getaddrinfo(pong_addr, pong_port, &gai_hints, &pong_addrinfo);
 	if(getaddrinfo(pong_addr, pong_port, &gai_hints, &pong_addrinfo) < 0)
 		fail_errno("Error: getaddrinfo() has failed.");
