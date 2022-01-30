@@ -68,36 +68,12 @@ double do_ping(size_t msg_size, int msg_no, char message[msg_size], int ping_soc
 
 	/*** Receive answer through the socket (non blocking mode, with timeout) ***/
 /*** TO BE DONE START ***/
-//E QUESTO------------------------------------------------------------------------------------------------------------------------
-	// // da rivedere
-	// /* Receive answer through the socket (blocking) */ //tcp del prof
-	// for (int offset = 0; (offset + (recv_bytes = recv(ping_socket, answer_buffer + offset, sent_bytes - offset, MSG_DONTWAIT))) < msg_size; offset += recv_bytes) {
-	// 	debug(" ... received %zd bytes back\n", recv_bytes);
-	// 	if (recv_bytes < 0)
-	// 		fail_errno("Error receiving data");
-	// }
 
+	//recv di tipo non blocking (MSG_DONTWAIT)
 	recv_bytes = recv(ping_socket, answer_buffer, msg_size, MSG_DONTWAIT);
-	printf("\n\nvwbvbrvrrevrie-->%zd", recv_bytes); //con webdev restutuisce -1 :(
 
-	recv_errno = errno; // vers lillo
-
-	// 	if((errno==EWOULDBLOCK)||(errno==EAGAIN))
-	// 		timeout*=2;
-
-	/* twingo */
-	// for (int offset = 0; (offset + (recv_bytes = recv(ping_socket, answer_buffer + offset, sent_bytes - offset, MSG_DONTWAIT))) < msg_size; offset += recv_bytes) {
-	// 	debug(" ... received %zd bytes back\n", recv_bytes);
-	// 	if (recv_bytes < 0)
-	// 		fail_errno("Error receiving data");
-	// }
-
-	// struct timespec current_time; // vers_mire
-	// do{
-	// 	recv_bytes = recv(ping_socket, answer_buffer, msg_size, 0);
-	// 	clock_gettime(CLOCK_TYPE, &current_time);
-	// 	recv_errno = errno;
-	// }while((recv_bytes < 0 ) && (timespec_delta2milliseconds(&current_time, &send_time) < timeout/2) && (recv_errno == EAGAIN || recv_errno == EWOULDBLOCK));
+	//salvo il valore globale di errno, per poi utilizzarla nel successivo ciclo di controllo
+	recv_errno = errno;
 
 /*** TO BE DONE END ***/
 
@@ -248,8 +224,8 @@ int main(int argc, char *argv[])
 /*** TO BE DONE START ***/
 //E QUESTO------------------------------------------------------------------------------------------------------------------------
 // anche qui, è necessario fare questa cosa in 2 righe invece di una?
-	gai_rv = getaddrinfo(argv[1], argv[2], &gai_hints, &server_addrinfo);
-	if (gai_rv != 0) //da errore qui
+	// gai_rv = getaddrinfo(argv[1], argv[2], &gai_hints, &server_addrinfo);
+	if (getaddrinfo(argv[1], argv[2], &gai_hints, &server_addrinfo) != 0) //da errore qui
 		fail_errno("getaddrinfo() error!");
 
 /*** TO BE DONE END ***/
