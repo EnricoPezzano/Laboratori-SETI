@@ -294,7 +294,7 @@ void redirect(int from_fd, int to_fd)
 				close(to_fd);
 				fatal_errno("dup2");
 			}
-			close (from_fd)
+			close (from_fd);
 		}
 	/*** TO BE DONE END ***/
 }
