@@ -161,10 +161,10 @@ command_t *parse_cmd(char * const cmdstr)
 			if (*tmp=='$') {
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
-				if (getenv(*tmp+1)==NULL)																								//funziona?
+				if (getenv(tmp+1)==NULL)																								//funziona?
 					tmp='\0';																															//asterisco o meno?
 				else
-					tmp=getenv(*tmp+1);																										//asterisco o meno?
+					tmp=getenv(tmp+1);																										//asterisco o meno?
 				/*** TO BE DONE END ***/
 			}
 			result->args[result->n_args++] = my_strdup(tmp);
@@ -211,6 +211,14 @@ check_t check_redirections(const line_t * const l)
 	 * and return CHECK_OK if everything is ok, CHECK_FAILED otherwise
 	 */
 	/*** TO BE DONE START ***/
+	for (int i=1; i<l->n_commands; i++)
+		if (strcmp(l->commands[i]->in_pathname, "0"))
+			return CHECK_FAILED;
+
+	for (int i=l->n_commands-2; i>=0; i--)
+		if (strcmp(l->commands[i]->out_pathname, "0"))
+			return CHECK_FAILED;
+
 	/*** TO BE DONE END ***/
 	return CHECK_OK;
 }
@@ -230,15 +238,15 @@ check_t check_cd(const line_t * const l)
 			if (strncmp(l->commands->args[0], "cd", 2))
 				//trovato
 	*/
-
-	bool is_here = false;
+/*
+	int is_here = 0;
   int cont = 0;
   for (int i=0; i< l->n_commands; i++)
   {
-      if(strncmp(l->commands->args[cont], "cd", 2)
-         is_here = true;
+      if(strncmp(l->commands->args[cont], "cd", 2))
+         is_here = 1;
 			else
-      	cont +=l->commands->n_args;
+      	cont += l->commands->n_args;
   }
 	if (!is_here)
 			return CHECK_OK;
@@ -252,7 +260,7 @@ check_t check_cd(const line_t * const l)
 	if (l->commands->args[1] == '<' || l->commands->args[1] == '>')
 		return CHECK_FAILED;
 
-
+*/
 
 	/*	if(strncmp("cd", l->commands[0]->args[0]),2)
 			printf("error")
@@ -269,15 +277,18 @@ void wait_for_children()
 	 * Similarly, if a child is killed by a signal, then you should print a message specifying its PID, signal number and name.
 	 */
 	/*** TO BE DONE START ***/
-	int status;																																		//qui ci salvo exit status
-	while ((int pid = wait (&status))!=-1) {																			//faccio wait finchè non ci sono più figli da aspettare. Quando non ci sono più figli wait() ritorna -1
+	int status;
+	pid_t pid;																																	//qui ci salvo exit status
+	while ((pid = wait (&status))!=-1) {																			//faccio wait finchè non ci sono più figli da aspettare. Quando non ci sono più figli wait() ritorna -1
 		if (WIFEXITED(status) != 0) {
-        int num = WEXITSTATUS(status);																					//qui ci entro se exit-status!=0
-        printf("Exited with status!=0 : %d\n", num);
+      int num = WEXITSTATUS(status);																						//qui ci entro se exit-status!=0
+      printf("Process with ID %d terminated with status: %d\n", pid, num);
     }
     else if ( WIFSIGNALED(status)) {																						//qui ci entro se il filgio è stato interrotto da un segnale
-        int num = WTERMSIG(status);
-        printf("Exited due to receiving signal %d\n", num);
+      int num = WTERMSIG(status);
+			string processName;
+			sprintf (processName, "/proc/%d/cmdline", pid);														//DA CONTROLLARE QUANDO COMPILIAMO
+      printf("Process %s with ID %d exited due to receiving signal %d\n", processName, pid,  num);
     }
 	}																																							//bisogna stampare pid e nomi segnali e capire se c'è qualcosa di ridondante all'inizio
 	/*** TO BE DONE END ***/
@@ -309,7 +320,8 @@ void run_child(const command_t * const c, int c_stdin, int c_stdout)
 	 * (printing error messages in case of failure, obviously)
 	 */
 	/*** TO BE DONE START ***/
-		if(pid_t pid = fork() == -1) 																								//posso fare una cosa del genere o devo dividere in due comandi separati?
+		pid_t pid = fork();
+		if(pid == -1)
 			fatal_errno("fork");
 		if (pid == 0) {																															//sono nel processo figlio
 			c_stdin = STDIN_FILENO;																										//sistremo input
@@ -327,7 +339,7 @@ void change_current_directory(char *newdir)
 	 * (printing an appropriate error message if the syscall fails)
 	 */
 	/*** TO BE DONE START ***/
-		if(chdir(newdir) = -1)																											//funziona?
+		if(chdir(newdir) == -1)																											//funziona?
 			fatal_errno("chdir");																											//basta veramente fare solamente chdir?
 	/*** TO BE DONE END ***/
 }
