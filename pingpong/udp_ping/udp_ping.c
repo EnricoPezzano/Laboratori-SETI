@@ -153,8 +153,8 @@ int prepare_udp_socket(char *pong_addr, char *pong_port)
 /*** TO BE DONE START ***/
 //E QUESTO------------------------------------------------------------------------------------------------------------------------
 	// è necessario fare questa cosa in 2 righe invece di una?
-	gai_rv = getaddrinfo(pong_addr, pong_port, &gai_hints, &pong_addrinfo);
-	if(gai_rv < 0)
+	// gai_rv = getaddrinfo(pong_addr, pong_port, &gai_hints, &pong_addrinfo);
+	if(getaddrinfo(pong_addr, pong_port, &gai_hints, &pong_addrinfo) < 0)
 		fail_errno("Error: getaddrinfo() has failed.");
 
 /*** TO BE DONE END ***/
@@ -251,8 +251,9 @@ int main(int argc, char *argv[])
 
     /*** Write the request on the TCP socket ***/
 /** TO BE DONE START ***/
-//E QUESTO---------------------------------------------------------prova a passare anche i flags---------------------------------------------------------------
-	if(write(ask_socket, request, server_addrinfo->ai_addrlen, server_addrinfo->ai_flags) == -1) //(int fd, const void *buf, size_t count);
+
+	//non passare i flags (too many arguments)
+	if(write(ask_socket, request, server_addrinfo->ai_addrlen) == -1) //(int fd, const void *buf, size_t count);
 		fail_errno("Error: write()'s execution failed.");
 
 /*** TO BE DONE END ***/
