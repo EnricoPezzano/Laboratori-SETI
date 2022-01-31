@@ -283,12 +283,12 @@ void wait_for_children()
 	/*** TO BE DONE START ***/
 	int status;
 	pid_t pid;
-	int num;
+
 	do {
 		pid = wait(&status);
 
-		if (num = WIFEXITED(status)) {
-			// int num = WEXITSTATUS(status);
+		if (WIFEXITED(status)) {
+			int num = status;
 			printf("Process with ID %d terminated with status: %d\n", pid, num);
 		}
 		else 
