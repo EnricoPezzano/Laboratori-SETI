@@ -233,6 +233,8 @@ check_t check_cd(const line_t * const l)
 	 * and return CHECK_OK if everything is ok, CHECK_FAILED otherwise
 	 */
 	/*** TO BE DONE START ***/
+// se c'è cd deve essere l'unico comando
+// e dopo che lo hai verificato devi vedere che non abbia redirezioni e che abbia un solo argomento
 
 	/*	for (int i=0; i < l->n_commands; i++)
 			if (strncmp(l->commands->args[0], "cd", 2))
