@@ -240,7 +240,7 @@ check_t check_redirections(const line_t * const l)
 	 */
 	/*** TO BE DONE START ***/
 	//gne
-	for (int i=1; i<l->n_commands; i++)
+	for (int i=1; i<l->n_commands-1; i++)
 		if (strcmp(l->commands[i]->in_pathname, "0")){
 			printf("oheuevevbenevnbnrevebnni");
 			return CHECK_FAILED;
@@ -389,7 +389,6 @@ void execute_line(const line_t * const l)
 			 * (handling error cases) */
 			/*** TO BE DONE START ***/
 
-			printf("\n\nciaooooooooooooooo");
 			curr_stdin = open(c->in_pathname, O_RDWR);
 			if(curr_stdin == -1)
 				fatal_errno("opening error!");
