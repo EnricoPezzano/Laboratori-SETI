@@ -235,47 +235,22 @@ check_t check_cd(const line_t * const l)
 	/*** TO BE DONE START ***/
 // se c'è cd deve essere l'unico comando
 // e dopo che lo hai verificato devi vedere che non abbia redirezioni e che abbia un solo argomento
-	for(int i=0; i < l->n_commands; i++)
-		for(int j=0; j < l->commands[i]->n_args; j++)
-			if(strncmp(l->commands[i]->args[j], "cd", 2)){
-				// 1) must be the only command of the line
-				// 2) cannot have I/O redirections
-				// 3) must have only one argument
-			}
-
-
-
-	/*	for (int i=0; i < l->n_commands; i++)
-			if (strncmp(l->commands->args[0], "cd", 2))
-				//trovato
-	*/
-/*
 	int is_here = 0;
-  int cont = 0;
-  for (int i=0; i< l->n_commands; i++)
-  {
-      if(strncmp(l->commands->args[cont], "cd", 2))
-         is_here = 1;
-			else
-      	cont += l->commands->n_args;
-  }
-	if (!is_here)
-			return CHECK_OK;
+	for(int i=0; i < l->n_commands; i++)
+		if(!strncmp(l->commands[i]->args[0], CD, 2)) //ci entra se trova cd
+			is_here = 1;
+	if (!is_here) //va bene che non ci sia, sarebbe un altro comando
+		return CHECK_OK;
+	else{
+		if(!strncmp(l->commands[0]->args[0], CD, 2) && l->n_commands>1)
+			return CHECK_FAILED;
 
-	if (l->n_commands > 1)
-		return CHECK_FAILED;
+		if(check_redirections(l) == CHECK_FAILED)
+			return CHECK_FAILED;
 
-	if (l->commands->n_args != 1)
-		return CHECK_FAILED;
-
-	if (l->commands->args[1] == '<' || l->commands->args[1] == '>')
-		return CHECK_FAILED;
-
-*/
-
-	/*	if(strncmp("cd", l->commands[0]->args[0]),2)
-			printf("error")
-	*/
+		if(l->commands[0]->n_args != 2)
+			return CHECK_FAILED;
+	}
 
 	/*** TO BE DONE END ***/
 	return CHECK_OK;
@@ -379,6 +354,11 @@ void execute_line(const line_t * const l)
 			/* Open c->in_pathname and assign the file-descriptor to curr_stdin
 			 * (handling error cases) */
 			/*** TO BE DONE START ***/
+
+			curr_stdin = open(c->in_pathname, O_RDWR);
+			if(curr_stdin == -1)
+				fatal_errno("opening error!");
+
 			/*** TO BE DONE END ***/
 		}
 		if (c->out_pathname) {
@@ -386,11 +366,19 @@ void execute_line(const line_t * const l)
 			/* Open c->out_pathname and assign the file-descriptor to curr_stdout
 			 * (handling error cases) */
 			/*** TO BE DONE START ***/
+
+			curr_stdout = open(c->out_pathname, O_RDWR);
+			if(curr_stdout == -1)
+				fatal_errno("opening error!");
+
 			/*** TO BE DONE END ***/
 		} else if (a != (l->n_commands - 1)) { /* unless we're processing the last command, we need to connect the current command and the next one with a pipe */
 			int fds[2];
 			/* Create a pipe in fds, and set FD_CLOEXEC in both file-descriptor flags */
 			/*** TO BE DONE START ***/
+
+			pipe2(fds, O_CLOEXEC);
+
 			/*** TO BE DONE END ***/
 			curr_stdout = fds[1];
 			next_stdin = fds[0];
@@ -425,7 +413,7 @@ int main()
 		 * The memory area must be allocated (directly or indirectly) via malloc.
 		 */
 		/*** TO BE DONE START ***/
-		char cwd[100]; //da aggiustare address sanitizer...fa pasticci
+		char* cwd = my_malloc(100); //da aggiustare address sanitizer...fa pasticci
 		getcwd(cwd, sizeof(cwd));
 		pwd = my_malloc(sizeof(cwd));
 		strcat(pwd, cwd);
