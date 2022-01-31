@@ -416,8 +416,8 @@ int main()
 		/*** TO BE DONE START ***/
 		// char* cwd = my_malloc(100); //da aggiustare address sanitizer...fa pasticci
 		//getcwd(cwd, sizeof(cwd));
-		pwd = my_malloc(sizeof(cwd));
-		strcat(pwd, cwd);
+		// pwd = my_malloc(sizeof(cwd));
+		// strcat(pwd, cwd);
 		// if (getcwd(pwd, sizeof(pwd)) == NULL)																						//dimensione di PATH_MAX = 4096 ... getcwd indirettamente fa la malloc
 		//	fatal_errno("getcwd");																										//errore in cwd
 		/*** TO BE DONE END ***/
