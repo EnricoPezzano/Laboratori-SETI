@@ -425,10 +425,10 @@ int main()
 		// 	fatal_errno("getcwd error!");
 
 		/*** TO BE DONE END ***/
-		pwd = my_realloc(pwd, strlen(pwd) + prompt_suffix_len + 1);
-		strcat(pwd, prompt_suffix);
-		char * const line = readline(pwd);
-		free(pwd);
+		// pwd = my_realloc(pwd, strlen(pwd) + prompt_suffix_len + 1);
+		// strcat(pwd, prompt_suffix);
+		// char * const line = readline(pwd);
+		// free(pwd);
 		if (!line) break;
 		execute(line);
 		free(line);
