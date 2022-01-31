@@ -294,7 +294,7 @@ void wait_for_children()
         // }
 
 		if (!WIFEXITED(status)) {
-			int num = status;
+			// int num = status;
 			printf("Process with ID %d terminated with status: %d\n", pid, WEXITSTATUS(status));
 		}
 		else 
