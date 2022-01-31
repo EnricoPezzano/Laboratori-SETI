@@ -289,7 +289,7 @@ void wait_for_children()
 
 		if (WIFEXITED(status)) {
 			int num = status;
-			printf("Process with ID %d terminated with status: %d\n", pid, num);
+			printf("Process with ID %d terminated with status: %d\n", pid, status);
 		}
 		else 
 			if (WIFSIGNALED(status)) {
