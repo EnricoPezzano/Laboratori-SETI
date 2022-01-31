@@ -93,7 +93,7 @@ void free_command(command_t * const c)
 	// 	free(c->args[j]);
 	// free(c);
 
-	 for (int i = 0; i < c->n_args; i++)
+	for (int i = 0; i < c->n_args; i++)
   		free(c->args[i]);
 	
 	free(c->args);
@@ -189,10 +189,12 @@ command_t *parse_cmd(char * const cmdstr)
 			if (*tmp=='$') {
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
+
 				if (getenv(tmp) == NULL) // perchè +1?
 					tmp = '\0';
 				else
 					tmp = getenv(tmp); // perchè +1?
+
 				/*** TO BE DONE END ***/
 			}
 			result->args[result->n_args++] = my_strdup(tmp);
@@ -240,7 +242,7 @@ check_t check_redirections(const line_t * const l)
 	 */
 	/*** TO BE DONE START ***/
 
-	for (int i=1; i<l->n_commands-1; i++)
+	for (int i=1; i<l->n_commands-1 && !(l->commands.empty()); i++)
 		if (strcmp(l->commands[i]->in_pathname, ">"))
 			return CHECK_FAILED;
 
@@ -271,7 +273,7 @@ check_t check_cd(const line_t * const l)
 	if (!is_here) //va bene che non ci sia, sarebbe un altro comando
 		return CHECK_OK;
 	else{
-		if(!strncmp(l->commands[0]->args[0], CD, 2) && l->n_commands>1) //gne
+		if(!strncmp(l->commands[0]->args[0], CD, 2) && l->n_commands>1)
 			return CHECK_FAILED;
 
 		if(check_redirections(l) == CHECK_FAILED)
@@ -339,12 +341,12 @@ void run_child(const command_t * const c, int c_stdin, int c_stdout)
 		pid_t pid = fork();
 		if(pid == -1)
 			fatal_errno("fork");
+
 		if (pid == 0) {																													
 			c_stdin = STDIN_FILENO;
 			c_stdout = STDOUT_FILENO;
 			if (execvp (c->args[0], c->args) == -1)
-				fatal_errno("execvp");
-			//IMPORTANTE																													
+				fatal_errno("execvp");																													
 		}
 	/*** TO BE DONE END ***/
 }
