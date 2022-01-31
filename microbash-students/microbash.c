@@ -235,6 +235,15 @@ check_t check_cd(const line_t * const l)
 	/*** TO BE DONE START ***/
 // se c'è cd deve essere l'unico comando
 // e dopo che lo hai verificato devi vedere che non abbia redirezioni e che abbia un solo argomento
+	for(int i=0; i < l->n_commands; i++)
+		for(int j=0; j < l->n_commands->n_args; j++)
+			if(strncmp(l->commands[i]->args[j], "cd", 2)){
+				// 1) must be the only command of the line
+				// 2) cannot have I/O redirections
+				// 3) must have only one argument
+			}
+
+
 
 	/*	for (int i=0; i < l->n_commands; i++)
 			if (strncmp(l->commands->args[0], "cd", 2))
