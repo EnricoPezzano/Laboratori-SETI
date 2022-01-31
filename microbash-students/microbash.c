@@ -41,7 +41,7 @@ void fatal_errno(const char * const msg)
 
 void *my_malloc(size_t size)
 {
-	void *rv = malloc(size);																											//puntatore void -> punta a un tipo non definito
+	void *rv = malloc(size);
 	if (!rv)
 		fatal_errno("my_malloc");
 	return rv;
@@ -57,23 +57,23 @@ void *my_realloc(void *ptr, size_t size)
 
 char *my_strdup(char *ptr)
 {
-	char *rv = strdup(ptr);																												//duplica la stringa
+	char *rv = strdup(ptr);
 	if (!rv)
 		fatal_errno("my_strdup");
 	return rv;
 }
 
-#define malloc I_really_should_not_be_using_a_bare_malloc												//non posso usare malloc, realloc o strdup della libc
+#define malloc I_really_should_not_be_using_a_bare_malloc
 #define realloc I_really_should_not_be_using_a_bare_realloc
 #define strdup I_really_should_not_be_using_a_bare_strdup
 
 static const int NO_REDIR = -1;
 
-typedef enum { CHECK_OK = 0, CHECK_FAILED = -1 } check_t;												//enum assegna stringhe a valori interi
+typedef enum { CHECK_OK = 0, CHECK_FAILED = -1 } check_t;
 
 static const char *const CD = "cd";
 
-typedef struct {																																//typedef rinomina le variabili
+typedef struct {
 	int n_args;
 	char **args; // in an execv*-compatible format; i.e., args[n_args]=0
 	char *out_pathname; // 0 if no output-redirection is present
@@ -89,7 +89,7 @@ void free_command(command_t * const c)
 {
 	assert(c==0 || c->n_args==0 || (c->n_args > 0 && c->args[c->n_args] == 0)); /* sanity-check: if c is not null, then it is either empty (in case of parsing error) or its args are properly NULL-terminated */
 	/*** TO BE DONE START ***/
-		free(c);																																		//basta così? la free è sufficiente?
+		free(c);
 	/*** TO BE DONE END ***/
 }
 
@@ -97,12 +97,12 @@ void free_line(line_t * const l)
 {
 	assert(l==0 || l->n_commands>=0); /* sanity-check */
 	/*** TO BE DONE START ***/
-		free(l);																																		//basta così? la free è sufficiente?
+		free(l);
 	/*** TO BE DONE END ***/
 }
 
-#ifdef DEBUG																																		//"ifdef (qualcosa)" sta per "se (qualcosa) è definito, allora faccio fino a #endif"
-	void print_command(const command_t * const c)																	//forse print_command e print_line sono cose per debug di Lagorio? DEBUG non viene definito da nessuna parte
+#ifdef DEBUG
+	void print_command(const command_t * const c)
 	{
 		if (!c) {
 			printf("Command == NULL\n");
@@ -111,7 +111,7 @@ void free_line(line_t * const l)
 		printf("[ ");
 		for(int a=0; a<c->n_args; ++a)
 			printf("%s ", c->args[a]);
-		assert(c->args[c->n_args] == 0);																						//assert fa finire il programma se il suo contenuto è falso
+		assert(c->args[c->n_args] == 0);
 		printf("] ");
 		printf("in: %s out: %s\n", c->in_pathname, c->out_pathname);
 	}
@@ -130,14 +130,14 @@ void free_line(line_t * const l)
 
 command_t *parse_cmd(char * const cmdstr)
 {
-	static const char *const BLANKS = " \t";																												//divido per caratteri che sono spazio o tab
-	command_t * const result = my_malloc(sizeof(*result));																					//alloco una variabile di tipo command_t per infilarci dentro i pezzi che ottengo
-	memset(result, 0, sizeof(*result));																															//copio 0 per sizeof(*result) volte in result   (pulisco result per il prossimo comando che arriva)
+	static const char *const BLANKS = " \t";
+	command_t * const result = my_malloc(sizeof(*result));
+	memset(result, 0, sizeof(*result));
 	char *saveptr, *tmp;
-	tmp = strtok_r(cmdstr, BLANKS, &saveptr);																												//cmdstr viene divisa per ogni BLANKS che incontra e i pezzi vengono salvati in tmp
+	tmp = strtok_r(cmdstr, BLANKS, &saveptr);
 	while (tmp) {
 		result->args = my_realloc(result->args, (result->n_args + 2)*sizeof(char *));
-		if (*tmp=='<') {																																							//se trovo redirezione input
+		if (*tmp=='<') {
 			if (result->in_pathname) {
 				fprintf(stderr, "Parsing error: cannot have more than one input redirection\n");
 				goto fail;
@@ -147,7 +147,7 @@ command_t *parse_cmd(char * const cmdstr)
 				goto fail;
 			}
 			result->in_pathname = my_strdup(tmp+1);
-		} else if (*tmp == '>') {																																			//se trovo redirezione output
+		} else if (*tmp == '>') {
 			if (result->out_pathname) {
 				fprintf(stderr, "Parsing error: cannot have more than one output redirection\n");
 				goto fail;
@@ -161,10 +161,10 @@ command_t *parse_cmd(char * const cmdstr)
 			if (*tmp=='$') {
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
-				if (getenv(tmp+1)==NULL)																								//funziona?
-					tmp="\0";																															//asterisco o meno?
+				if (getenv(tmp+1)==NULL)
+					tmp="\0";
 				else
-					tmp=getenv(tmp+1);																										//asterisco o meno?
+					tmp=getenv(tmp+1);
 				/*** TO BE DONE END ***/
 			}
 			result->args[result->n_args++] = my_strdup(tmp);
@@ -215,7 +215,7 @@ check_t check_redirections(const line_t * const l)
 		if (strcmp(l->commands[i]->in_pathname, "0"))
 			return CHECK_FAILED;
 
-	for (int i=l->n_commands-2; i>=0; i--)
+	for (int i=l->n_commands-2; i>0; i--)
 		if (strcmp(l->commands[i]->out_pathname, "0"))
 			return CHECK_FAILED;
 
@@ -264,19 +264,19 @@ void wait_for_children()
 	 */
 	/*** TO BE DONE START ***/
 	int status;
-	pid_t pid;																																	//qui ci salvo exit status
-	while ((pid = wait (&status))!=-1) {																			//faccio wait finchè non ci sono più figli da aspettare. Quando non ci sono più figli wait() ritorna -1
+	pid_t pid;
+	while ((pid = wait (&status))!=-1) {
 		if (WIFEXITED(status) != 0) {
-      int num = WEXITSTATUS(status);																						//qui ci entro se exit-status!=0
+      int num = WEXITSTATUS(status);
       printf("Process with ID %d terminated with status: %d\n", pid, num);
     }
-    else if ( WIFSIGNALED(status)) {																						//qui ci entro se il filgio è stato interrotto da un segnale
+    else if ( WIFSIGNALED(status)) {
       int num = WTERMSIG(status);
 			char* processName = my_malloc(4096);
-			sprintf (processName, "/proc/%d/cmdline", pid);														//DA CONTROLLARE QUANDO COMPILIAMO
+			sprintf (processName, "/proc/%d/cmdline", pid);
       printf("Process %s with ID %d exited due to receiving signal %d\n", processName, pid,  num);
     }
-	}																																							//bisogna stampare pid e nomi segnali e capire se c'è qualcosa di ridondante all'inizio
+	}
 	/*** TO BE DONE END ***/
 }
 
@@ -309,12 +309,12 @@ void run_child(const command_t * const c, int c_stdin, int c_stdout)
 		pid_t pid = fork();
 		if(pid == -1)
 			fatal_errno("fork");
-		if (pid == 0) {																															//sono nel processo figlio
-			c_stdin = STDIN_FILENO;																										//sistremo input
-			c_stdout = STDOUT_FILENO;																									//sistemo output
-			if (execvp (c->args[0], c->args) == -1)																		//posso fare una cosa del genere o devo dividere in due comandi separati?
+		if (pid == 0) {																													
+			c_stdin = STDIN_FILENO;
+			c_stdout = STDOUT_FILENO;
+			if (execvp (c->args[0], c->args) == -1)
 				fatal_errno("execvp");
-			//IMPORTANTE																															//DEVO FARE EXIT() O EXEC() FA TUTTO DA SOLA?
+			//IMPORTANTE																													
 		}
 	/*** TO BE DONE END ***/
 }
@@ -325,8 +325,8 @@ void change_current_directory(char *newdir)
 	 * (printing an appropriate error message if the syscall fails)
 	 */
 	/*** TO BE DONE START ***/
-		if(chdir(newdir) == -1)																											//funziona?
-			fatal_errno("chdir");																											//basta veramente fare solamente chdir?
+		if(chdir(newdir) == -1)
+			fatal_errno("chdir");
 	/*** TO BE DONE END ***/
 }
 
