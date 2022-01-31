@@ -414,7 +414,7 @@ int main()
 		 * The memory area must be allocated (directly or indirectly) via malloc.
 		 */
 		/*** TO BE DONE START ***/
-		char* cwd = my_malloc(100); //da aggiustare address sanitizer...fa pasticci
+		// char* cwd = my_malloc(100); //da aggiustare address sanitizer...fa pasticci
 		//getcwd(cwd, sizeof(cwd));
 		pwd = my_malloc(sizeof(cwd));
 		strcat(pwd, cwd);
