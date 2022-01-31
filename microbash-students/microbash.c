@@ -283,18 +283,22 @@ void wait_for_children()
 	/*** TO BE DONE START ***/
 	int status;
 	pid_t pid;
-	while ((pid = wait (&status))!=-1) {
+
+	do {
+		pid = wait(&status);
+
 		if (WIFEXITED(status) != 0) {
-      int num = WEXITSTATUS(status);
-      printf("Process with ID %d terminated with status: %d\n", pid, num);
-    }
-    else if ( WIFSIGNALED(status)) {
-      int num = WTERMSIG(status);
-			char* processName = my_malloc(4096);
-			sprintf (processName, "/proc/%d/cmdline", pid);
-      printf("Process %s with ID %d exited due to receiving signal %d\n", processName, pid,  num);
-    }
-	}
+			int num = WEXITSTATUS(status);
+			printf("Process with ID %d terminated with status: %d\n", pid, num);
+		}
+		else 
+			if ( WIFSIGNALED(status)) {
+				int num = WTERMSIG(status);
+				char* processName = my_malloc(4096);
+				sprintf (processName, "/proc/%d/cmdline", pid);
+				printf("Process %s with ID %d exited due to receiving signal %d\n", processName, pid,  num);
+			}
+	} while (pid != -1);
 	/*** TO BE DONE END ***/
 }
 
