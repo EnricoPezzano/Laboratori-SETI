@@ -419,10 +419,10 @@ int main()
 		 */
 		/*** TO BE DONE START ***/
 		
-		pwd = NULL;
-		pwd = getcwd(pwd, 0);
-		if(pwd == NULL)
-			fatal_errno("getcwd error!");
+		// pwd = NULL;
+		// pwd = getcwd(pwd, 0);
+		// if(pwd == NULL)
+		// 	fatal_errno("getcwd error!");
 
 		/*** TO BE DONE END ***/
 		pwd = my_realloc(pwd, strlen(pwd) + prompt_suffix_len + 1);
