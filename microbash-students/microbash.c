@@ -246,7 +246,7 @@ check_t check_redirections(const line_t * const l)
 		if (strcmp(l->commands[i]->in_pathname, ">"))
 			return CHECK_FAILED;
 
-	for (int i=l->n_commands-1; i>0; i--)
+	for (int i=l->n_commands-1; i>1; i--)
 		if (strcmp(l->commands[i]->out_pathname, "<"))
 			return CHECK_FAILED;
 
