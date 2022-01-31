@@ -189,10 +189,10 @@ command_t *parse_cmd(char * const cmdstr)
 			if (*tmp=='$') {
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
-				if (getenv(tmp+1)==NULL)
-					tmp="\0";
+				if (getenv(tmp) == NULL)
+					tmp = '\0';
 				else
-					tmp=getenv(tmp+1);
+					tmp = getenv(tmp);
 				/*** TO BE DONE END ***/
 			}
 			result->args[result->n_args++] = my_strdup(tmp);
