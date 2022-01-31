@@ -89,11 +89,18 @@ void free_command(command_t * const c)
 {
 	assert(c==0 || c->n_args==0 || (c->n_args > 0 && c->args[c->n_args] == 0)); /* sanity-check: if c is not null, then it is either empty (in case of parsing error) or its args are properly NULL-terminated */
 	/*** TO BE DONE START ***/
+	// for(int j=0; j<c->n_args; j++)
+	// 	free(c->args[j]);
+	// free(c);
 
-	for(int j=0; j<c->n_args; j++)
-		free(c->args[j]);
+	 for (int i = 0; i < c->n_args; i++)
+  		free(c->args[i]);
+	
+	free(c->args);
+	free(c->in_pathname);
+	free(c->out_pathname);
+ 	free(c);
 
-	free(c);
 
 	/*** TO BE DONE END ***/
 }
@@ -102,15 +109,22 @@ void free_line(line_t * const l)
 {
 	assert(l==0 || l->n_commands>=0); /* sanity-check */
 	/*** TO BE DONE START ***/
+	// for(int i=0; i<l->n_commands; i++)
+	// 	for(int j=0; j<l->commands[i]->n_args; j++)
+	// 		free(l->commands[i]->args[j]);
 
-	for(int i=0; i<l->n_commands; i++)
-		for(int j=0; j<l->commands[i]->n_args; j++)
-			free(l->commands[i]->args[j]);
+	// for(int i=0; i<l->n_commands; i++)
+	// 	free(l->commands[i]);
 
-	for(int i=0; i<l->n_commands; i++)
-		free(l->commands[i]);
+	// free(l);
+	// --------------------------------------------
 
+	for (int i = 0; i < l->n_commands; i++)
+		free_command(l->commands[i]);
+
+	free(l->commands);
 	free(l);
+
 
 	/*** TO BE DONE END ***/
 }
@@ -286,12 +300,6 @@ void wait_for_children()
 
 	do {
 		pid = wait(&status);
-
-		// if ( ! (WIFEXITED(status) && (WEXITSTATUS(status) == 0)) )  /* kill all running agents */{
-        //     fprintf( stderr,"Child failed. Killing all running children.\n");
-        //    //some code to kill children here
-        //     exit(1);
-        // }
 
 		if (!WIFEXITED(status)) 
 			printf("Process with ID %d terminated with status: %d\n", pid, WEXITSTATUS(status));
