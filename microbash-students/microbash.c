@@ -414,12 +414,12 @@ int main()
 		 * The memory area must be allocated (directly or indirectly) via malloc.
 		 */
 		/*** TO BE DONE START ***/
-		// char* cwd = my_malloc(100); //da aggiustare address sanitizer...fa pasticci
-		//getcwd(cwd, sizeof(cwd));
-		// pwd = my_malloc(sizeof(cwd));
-		// strcat(pwd, cwd);
-		// if (getcwd(pwd, sizeof(pwd)) == NULL)																						//dimensione di PATH_MAX = 4096 ... getcwd indirettamente fa la malloc
-		//	fatal_errno("getcwd");																										//errore in cwd
+		
+		pwd = NULL;
+		pwd = getcwd(pwd, 0);
+		if(pwd == NULL)
+			fatal_errno("getcwd error!");
+
 		/*** TO BE DONE END ***/
 		pwd = my_realloc(pwd, strlen(pwd) + prompt_suffix_len + 1);
 		strcat(pwd, prompt_suffix);
