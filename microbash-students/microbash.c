@@ -212,12 +212,16 @@ check_t check_redirections(const line_t * const l)
 	 */
 	/*** TO BE DONE START ***/
 	for (int i=1; i<l->n_commands; i++)
-		if (strcmp(l->commands[i]->in_pathname, "0"))
+		if (strcmp(l->commands[i]->in_pathname, "0")){
+			printf("oheuevevbenevnbnrevebnni");
 			return CHECK_FAILED;
+		}
 
-	for (int i=l->n_commands-2; i>0; i--)
-		if (strcmp(l->commands[i]->out_pathname, "0"))
+	for (int i=l->n_commands-2; i>=0; i--)
+		if (strcmp(l->commands[i]->out_pathname, "0")){
+			printf("hello");
 			return CHECK_FAILED;
+		}
 
 	/*** TO BE DONE END ***/
 	return CHECK_OK;
