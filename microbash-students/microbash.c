@@ -89,7 +89,12 @@ void free_command(command_t * const c)
 {
 	assert(c==0 || c->n_args==0 || (c->n_args > 0 && c->args[c->n_args] == 0)); /* sanity-check: if c is not null, then it is either empty (in case of parsing error) or its args are properly NULL-terminated */
 	/*** TO BE DONE START ***/
-		free(c);
+
+	for(int j=0; j<c->n_args; j++)
+		free(c->args[j]);
+
+	free(c);
+
 	/*** TO BE DONE END ***/
 }
 
@@ -97,7 +102,16 @@ void free_line(line_t * const l)
 {
 	assert(l==0 || l->n_commands>=0); /* sanity-check */
 	/*** TO BE DONE START ***/
-		free(l);
+
+	for(int i=0; i<l->n_commands; i++)
+		for(int j=0; j<l->commands[i]->n_args; j++)
+			free(l->commands[i]->args[j]);
+
+	for(int i=0; i<l->n_commands; i++)
+		free(l->commands[i]);
+
+	free(l);
+
 	/*** TO BE DONE END ***/
 }
 
@@ -419,16 +433,16 @@ int main()
 		 */
 		/*** TO BE DONE START ***/
 		
-		// pwd = NULL;
-		// pwd = getcwd(pwd, 0);
-		// if(pwd == NULL)
-		// 	fatal_errno("getcwd error!");
+		pwd = NULL;
+		pwd = getcwd(pwd, 0);
+		if(pwd == NULL)
+			fatal_errno("getcwd error!");
 
 		/*** TO BE DONE END ***/
-		// pwd = my_realloc(pwd, strlen(pwd) + prompt_suffix_len + 1);
-		// strcat(pwd, prompt_suffix);
-		// char * const line = readline(pwd);
-		// free(pwd);
+		pwd = my_realloc(pwd, strlen(pwd) + prompt_suffix_len + 1);
+		strcat(pwd, prompt_suffix);
+		char * const line = readline(pwd);
+		free(pwd);
 		if (!line) break;
 		execute(line);
 		free(line);
