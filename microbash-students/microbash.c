@@ -296,7 +296,7 @@ void wait_for_children()
 		if (!WIFEXITED(status)) 
 			printf("Process with ID %d terminated with status: %d\n", pid, WEXITSTATUS(status));
 		else 
-			if (!WIFSIGNALED(status)) {
+			if (WIFSIGNALED(status)) {
 				char* processName = my_malloc(4096);
 				sprintf (processName, "/proc/%d/cmdline", pid);
 				printf("Process %s with ID %d exited due to receiving signal %d\n", processName, pid,  WTERMSIG(status));
