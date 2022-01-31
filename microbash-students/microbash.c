@@ -377,7 +377,8 @@ void execute_line(const line_t * const l)
 			/* Create a pipe in fds, and set FD_CLOEXEC in both file-descriptor flags */
 			/*** TO BE DONE START ***/
 
-			pipe2(fds, O_CLOEXEC);
+			if(pipe2(fds, O_CLOEXEC) == -1)
+				fatal_errno("opening error!");
 
 			/*** TO BE DONE END ***/
 			curr_stdout = fds[1];
