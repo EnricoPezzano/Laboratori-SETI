@@ -287,22 +287,19 @@ void wait_for_children()
 	do {
 		pid = wait(&status);
 
-		// if ( ! (WIFEXITED(status) && (WEXITSTATUS(status) == 0)) )  /* kill all running agents */{
-        //     fprintf( stderr,"Child failed. Killing all running children.\n");
-        //    //some code to kill children here
-        //     exit(1);
-        // }
+		if ( ! (WIFEXITED(status) && (WEXITSTATUS(status) == 0)) )  /* kill all running agents */{
+            fprintf( stderr,"Child failed. Killing all running children.\n");
+           //some code to kill children here
+            exit(1);
+        }
 
-		if (!WIFEXITED(status)) {
-			// int num = status;
+		if (!WIFEXITED(status)) 
 			printf("Process with ID %d terminated with status: %d\n", pid, WEXITSTATUS(status));
-		}
 		else 
-			if (WIFSIGNALED(status)) {
-				int num = WTERMSIG(status);
+			if (!WIFSIGNALED(status)) {
 				char* processName = my_malloc(4096);
 				sprintf (processName, "/proc/%d/cmdline", pid);
-				printf("Process %s with ID %d exited due to receiving signal %d\n", processName, pid,  num);
+				printf("Process %s with ID %d exited due to receiving signal %d\n", processName, pid,  WTERMSIG(status));
 			}
 	} while (pid != -1);
 	/*** TO BE DONE END ***/
