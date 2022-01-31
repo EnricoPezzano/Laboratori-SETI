@@ -239,6 +239,7 @@ check_t check_redirections(const line_t * const l)
 	 * and return CHECK_OK if everything is ok, CHECK_FAILED otherwise
 	 */
 	/*** TO BE DONE START ***/
+	//gne
 	for (int i=1; i<l->n_commands; i++)
 		if (strcmp(l->commands[i]->in_pathname, "0")){
 			printf("oheuevevbenevnbnrevebnni");
@@ -274,7 +275,7 @@ check_t check_cd(const line_t * const l)
 	if (!is_here) //va bene che non ci sia, sarebbe un altro comando
 		return CHECK_OK;
 	else{
-		if(!strncmp(l->commands[0]->args[0], CD, 2) && l->n_commands>1)
+		if(!strncmp(l->commands[0]->args[0], CD, 2) && l->n_commands>1) //gne
 			return CHECK_FAILED;
 
 		if(check_redirections(l) == CHECK_FAILED)
