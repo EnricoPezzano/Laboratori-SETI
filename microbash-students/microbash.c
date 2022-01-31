@@ -242,7 +242,7 @@ check_t check_redirections(const line_t * const l)
 	 */
 	/*** TO BE DONE START ***/
 
-	for (int i=1; i<l->n_commands-1 && !(l->commands.empty()); i++)
+	for (int i=0; i<l->n_commands-2; i++)
 		if (strcmp(l->commands[i]->in_pathname, ">"))
 			return CHECK_FAILED;
 
