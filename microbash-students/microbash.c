@@ -287,11 +287,11 @@ void wait_for_children()
 	do {
 		pid = wait(&status);
 
-		if ( ! (WIFEXITED(status) && (WEXITSTATUS(status) == 0)) )  /* kill all running agents */{
-            fprintf( stderr,"Child failed. Killing all running children.\n");
-           //some code to kill children here
-            exit(1);
-        }
+		// if ( ! (WIFEXITED(status) && (WEXITSTATUS(status) == 0)) )  /* kill all running agents */{
+        //     fprintf( stderr,"Child failed. Killing all running children.\n");
+        //    //some code to kill children here
+        //     exit(1);
+        // }
 
 		if (!WIFEXITED(status)) 
 			printf("Process with ID %d terminated with status: %d\n", pid, WEXITSTATUS(status));
