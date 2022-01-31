@@ -287,12 +287,12 @@ void wait_for_children()
 	do {
 		pid = wait(&status);
 
-		if (WIFEXITED(status) != 0) {
+		if (WIFEXITED(status)) {
 			int num = WEXITSTATUS(status);
 			printf("Process with ID %d terminated with status: %d\n", pid, num);
 		}
 		else 
-			if ( WIFSIGNALED(status)) {
+			if (WIFSIGNALED(status)) {
 				int num = WTERMSIG(status);
 				char* processName = my_malloc(4096);
 				sprintf (processName, "/proc/%d/cmdline", pid);
