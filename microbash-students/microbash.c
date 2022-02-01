@@ -190,7 +190,7 @@ command_t *parse_cmd(char * const cmdstr)
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
 
-				tmp = getenv(tmp+1);
+				*tmp = getenv(tmp+1);
 				if (tmp == NULL)
 					tmp = '\0';
 
