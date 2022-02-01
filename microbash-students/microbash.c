@@ -190,10 +190,9 @@ command_t *parse_cmd(char * const cmdstr)
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
 
-				if (getenv(tmp+1) == NULL) // perchè +1?
+				tmp = getenv(tmp+1);
+				if (tmp == NULL)
 					tmp = '\0';
-				else
-					tmp = getenv(tmp+1);
 
 				/*** TO BE DONE END ***/
 			}
@@ -411,7 +410,7 @@ void execute_line(const line_t * const l)
 			/* Open c->in_pathname and assign the file-descriptor to curr_stdin
 			 * (handling error cases) */
 			/*** TO BE DONE START ***/
-			if (setuid(0) == -1)
+			// if (setuid(0) == -1)
 				//fatal_errno("setuid error");
 			curr_stdin = open (c->in_pathname, O_CREAT|O_RDWR, 0644);
 
