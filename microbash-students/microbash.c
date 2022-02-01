@@ -192,7 +192,7 @@ command_t *parse_cmd(char * const cmdstr)
 
 				tmp = getenv(tmp+1);
 				if (tmp == NULL)
-					tmp+1 = "\0";
+					tmp[1] = "\0";
 
 				/*** TO BE DONE END ***/
 			}
