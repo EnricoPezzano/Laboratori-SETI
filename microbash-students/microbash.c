@@ -411,8 +411,8 @@ void execute_line(const line_t * const l)
 			 * (handling error cases) */
 			/*** TO BE DONE START ***/
 
-			if (setuid(0) == -1)
-				fatal_errno("setuid error");
+			// if (setuid(0) == -1)
+			// 	fatal_errno("setuid error");
 
 			if (seteuid(0) == -1)
 				fatal_errno("seteuid error");
