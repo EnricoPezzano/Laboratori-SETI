@@ -89,18 +89,14 @@ void free_command(command_t * const c)
 {
 	assert(c==0 || c->n_args==0 || (c->n_args > 0 && c->args[c->n_args] == 0)); /* sanity-check: if c is not null, then it is either empty (in case of parsing error) or its args are properly NULL-terminated */
 	/*** TO BE DONE START ***/
-	// for(int j=0; j<c->n_args; j++)
-	// 	free(c->args[j]);
-	// free(c);
 
 	for (int i = 0; i < c->n_args; i++)
-  		free(c->args[i]);
+  	free(c->args[i]);
 
 	free(c->args);
 	free(c->in_pathname);
 	free(c->out_pathname);
  	free(c);
-
 
 	/*** TO BE DONE END ***/
 }
@@ -109,22 +105,12 @@ void free_line(line_t * const l)
 {
 	assert(l==0 || l->n_commands>=0); /* sanity-check */
 	/*** TO BE DONE START ***/
-	// for(int i=0; i<l->n_commands; i++)
-	// 	for(int j=0; j<l->commands[i]->n_args; j++)
-	// 		free(l->commands[i]->args[j]);
-
-	// for(int i=0; i<l->n_commands; i++)
-	// 	free(l->commands[i]);
-
-	// free(l);
-	// --------------------------------------------
 
 	for (int i = 0; i < l->n_commands; i++)
 		free_command(l->commands[i]);
 
 	free(l->commands);
 	free(l);
-
 
 	/*** TO BE DONE END ***/
 }
@@ -195,18 +181,6 @@ command_t *parse_cmd(char * const cmdstr)
 					tmp[1] = '\0';
 					fatal_errno("enviroment error: variable does not exist\n");
 				}
-					
-
-				// if (!tmp++)
-				// 	tmp = "";
-				// else
-				// 	tmp = getenv(tmp);
-
-				// if (!tmp){
-				// 	fprintf(stderr, "Environment variable error: variable doesn't exists\n");
-				// 	goto fail;
-				// }
-
 
 				/*** TO BE DONE END ***/
 			}
@@ -255,19 +229,19 @@ check_t check_redirections(const line_t * const l)
 	 */
 	/*** TO BE DONE START ***/
 
-		for (int i=0; i < l->n_commands; ++i) {
-	    if (l->commands[i]->in_pathname)
-			 	if (i != 0) {
-				fatal_errno ("redirezione input non al primo comando");
-	    	return CHECK_FAILED;
-				}
+	for (int i=0; i < l->n_commands; ++i) {
+    if (l->commands[i]->in_pathname)
+		 	if (i != 0) {
+				fatal_errno ("input redirection not as first command");
+		  	return CHECK_FAILED;
+			}
 
-			if (l->commands[i]->out_pathname)
-		 		if (i != (l->n_commands-1)) {
-				fatal_errno ("redirezione output non all'ultimo comando");
+		if (l->commands[i]->out_pathname)
+	 		if (i != (l->n_commands-1)) {
+				fatal_errno ("output redirection not as last command");
 				return CHECK_FAILED;
-	  		}
-		}
+  		}
+	}
 
 	/*** TO BE DONE END ***/
 	return CHECK_OK;
@@ -283,8 +257,6 @@ check_t check_cd(const line_t * const l)
 	 * and return CHECK_OK if everything is ok, CHECK_FAILED otherwise
 	 */
 	/*** TO BE DONE START ***/
-// se c'è cd deve essere l'unico comando
-// e dopo che lo hai verificato devi vedere che non abbia redirezioni e che abbia un solo argomento
 
 	int is_here = 0;
 	for(int i=0; i < l->n_commands; i++)
@@ -292,33 +264,31 @@ check_t check_cd(const line_t * const l)
 			if (i==0)
 				is_here = 1;
 			else {
-				printf("cd non in prima posizione\n");
+				fatal_errno ("cd not in first position!\n");
 				return CHECK_FAILED;
 			}
 		}
 	for (int i=0; i < l->n_commands; ++i) {
     if (((l->commands[i]->in_pathname != 0) || (l->commands[i]->out_pathname != 0)) && is_here == 1) {
-			printf("cd con redirezioni\n");
+			fatal_errno ("cd with redirections!\n");
     	return CHECK_FAILED;
 		}
 	}
 
 	if (is_here == 0) {
-		printf("non c'è il cd\n");
 		return CHECK_OK;
 	}
 
 	if(is_here == 1 && l->n_commands>1) {
-		printf("piu di un comando oltre al cd\n");
+		fatal_errno("more than one command with cd!\n");
 		return CHECK_FAILED;
 	}
 
 	if(l->commands[0]->n_args > 2) {
-		printf("troppi argomenti\n");
+	  fatal_errno ("too many arguments!\n");
 		return CHECK_FAILED;
 	}
 
-	printf("cd in maniera giusta\n");
 	return CHECK_OK;
 }
 
@@ -358,10 +328,12 @@ void redirect(int from_fd, int to_fd)
 	/*** TO BE DONE START ***/
 		if (from_fd!=NO_REDIR){
 			if(dup2(from_fd, to_fd) == -1){
-				close(to_fd);
+				if (close(to_fd) == -1)
+					fatal_errno ("close");
 				fatal_errno("dup2");
 			}
-			close (from_fd);
+			if (close (from_fd) == -1)
+				fatal_errno ("close");
 		}
 	/*** TO BE DONE END ***/
 }
@@ -425,13 +397,10 @@ void execute_line(const line_t * const l)
 			 * (handling error cases) */
 			/*** TO BE DONE START ***/
 
-			// if (setuid(0) == -1)
-			// 	fatal_errno("setuid error"); // quindi è giusto farla partire con sudo??
-
 			curr_stdin = open (c->in_pathname, O_CREAT|O_RDWR, 0644);
 
 			if(curr_stdin == -1)
-				fatal_errno("opening in error!");
+				fatal_errno("opening c->in_pathname error!");
 
 			/*** TO BE DONE END ***/
 		}
@@ -441,7 +410,7 @@ void execute_line(const line_t * const l)
 			curr_stdout = open (c->out_pathname, O_CREAT|O_RDWR|O_TRUNC, 0644);
 
 			if(curr_stdout == -1)
-				fatal_errno("opening out error!");
+				fatal_errno("opening c->out_pathname error!");
 
 			/*** TO BE DONE END ***/
 		} else if (a != (l->n_commands - 1)) { /* unless we're processing the last command, we need to connect the current command and the next one with a pipe */
