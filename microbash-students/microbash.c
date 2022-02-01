@@ -414,8 +414,8 @@ void execute_line(const line_t * const l)
 			// if (setuid(0) == -1)
 			// 	fatal_errno("setuid error");
 
-			if (seteuid(0) == -1)
-				fatal_errno("seteuid error");
+			// if (seteuid(0) == -1)
+			// 	fatal_errno("seteuid error");
 
 			if (setegid(0) == -1)
 				fatal_errno("setgid error");
