@@ -95,7 +95,7 @@ void free_command(command_t * const c)
 
 	for (int i = 0; i < c->n_args; i++)
   		free(c->args[i]);
-	
+
 	free(c->args);
 	free(c->in_pathname);
 	free(c->out_pathname);
@@ -190,10 +190,10 @@ command_t *parse_cmd(char * const cmdstr)
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
 
-				if (getenv(tmp) == NULL) // perchè +1?
+				if (getenv(tmp+1) == NULL) // perchè +1?
 					tmp = '\0';
 				else
-					tmp = getenv(tmp); // perchè +1?
+					tmp = getenv(tmp+1);
 
 				/*** TO BE DONE END ***/
 			}
@@ -242,13 +242,19 @@ check_t check_redirections(const line_t * const l)
 	 */
 	/*** TO BE DONE START ***/
 
-	for (int i=0; i<l->n_commands-2; i++)
-		if (strcmp(l->commands[i]->in_pathname, ">"))
-			return CHECK_FAILED;
+		for (int i=0; i < l->n_commands; ++i) {
+	    if (l->commands[i]->in_pathname)
+			 	if (i != 0) {
+				fatal_errno ("redirezione input non al primo comando");
+	    	return CHECK_FAILED;
+				}
 
-	for (int i=l->n_commands-1; i>1; i--)
-		if (strcmp(l->commands[i]->out_pathname, "<"))
-			return CHECK_FAILED;
+			if (l->commands[i]->out_pathname)
+		 		if (i != (l->n_commands-1)) {
+				fatal_errno ("redirezione output non all'ultimo comando");
+				return CHECK_FAILED;
+	  		}
+		}
 
 	/*** TO BE DONE END ***/
 	return CHECK_OK;
@@ -266,24 +272,40 @@ check_t check_cd(const line_t * const l)
 	/*** TO BE DONE START ***/
 // se c'è cd deve essere l'unico comando
 // e dopo che lo hai verificato devi vedere che non abbia redirezioni e che abbia un solo argomento
+
 	int is_here = 0;
 	for(int i=0; i < l->n_commands; i++)
-		if(!strncmp(l->commands[i]->args[0], CD, 2)) //ci entra se trova cd
-			is_here = 1;
-	if (!is_here) //va bene che non ci sia, sarebbe un altro comando
-		return CHECK_OK;
-	else{
-		if(!strncmp(l->commands[0]->args[0], CD, 2) && l->n_commands>1)
-			return CHECK_FAILED;
-
-		if(check_redirections(l) == CHECK_FAILED)
-			return CHECK_FAILED;
-
-		if(l->commands[0]->n_args != 2)
-			return CHECK_FAILED;
+		if(strncmp(l->commands[i]->args[0], CD, 2) == 0) {
+			if (i==0)
+				is_here = 1;
+			else {
+				printf("cd non in prima posizione\n");
+				return CHECK_FAILED;
+			}
+		}
+	for (int i=0; i < l->n_commands; ++i) {
+    if (((l->commands[i]->in_pathname != 0) || (l->commands[i]->out_pathname != 0)) && is_here == 1) {
+			printf("cd con redirezioni\n");
+    	return CHECK_FAILED;
+		}
 	}
 
-	/*** TO BE DONE END ***/
+	if (is_here == 0) {
+		printf("non c'è il cd\n");
+		return CHECK_OK;
+	}
+
+	if(is_here == 1 && l->n_commands>1) {
+		printf("piu di un comando oltre al cd\n");
+		return CHECK_FAILED;
+	}
+
+	if(l->commands[0]->n_args > 2) {
+		printf("troppi argomenti\n");
+		return CHECK_FAILED;
+	}
+
+	printf("cd in maniera giusta\n");
 	return CHECK_OK;
 }
 
@@ -295,20 +317,23 @@ void wait_for_children()
 	 */
 	/*** TO BE DONE START ***/
 	int status;
-	pid_t pid;
+	pid_t pid = 0;
 
-	do {
+	while (pid != -1) {
 		pid = wait(&status);
-
-		if (!WIFEXITED(status)) 
-			printf("Process with ID %d terminated with status: %d\n", pid, WEXITSTATUS(status));
-		else 
-			if (WIFSIGNALED(status)) {
+		if (WIFEXITED(status) && pid != -1) {
+			int exit_status = WEXITSTATUS(status);
+			if (exit_status != 0)
+				printf("Process with ID %d terminated with status: %d\n", pid, exit_status);
+		}
+		else
+			if (WIFSIGNALED(status) && pid != -1) {
 				char* processName = my_malloc(4096);
 				sprintf (processName, "/proc/%d/cmdline", pid);
 				printf("Process %s with ID %d exited due to receiving signal %d\n", processName, pid,  WTERMSIG(status));
+				free (processName);
 			}
-	} while (pid != -1);
+	}
 	/*** TO BE DONE END ***/
 }
 
@@ -342,11 +367,11 @@ void run_child(const command_t * const c, int c_stdin, int c_stdout)
 		if(pid == -1)
 			fatal_errno("fork");
 
-		if (pid == 0) {																													
-			c_stdin = STDIN_FILENO;
-			c_stdout = STDOUT_FILENO;
+		if (pid == 0) {
+			redirect (c_stdin, STDIN_FILENO);
+			redirect (c_stdout, STDOUT_FILENO);
 			if (execvp (c->args[0], c->args) == -1)
-				fatal_errno("execvp");																													
+				fatal_errno("execvp");
 		}
 	/*** TO BE DONE END ***/
 }
@@ -386,22 +411,22 @@ void execute_line(const line_t * const l)
 			/* Open c->in_pathname and assign the file-descriptor to curr_stdin
 			 * (handling error cases) */
 			/*** TO BE DONE START ***/
+			if (setuid(0) == -1)
+				//fatal_errno("setuid error");
+			curr_stdin = open (c->in_pathname, O_CREAT|O_RDWR, 0644);
 
-			curr_stdin = open(c->in_pathname, O_RDWR);
 			if(curr_stdin == -1)
-				fatal_errno("opening error!");
+				fatal_errno("opening in error!");
 
 			/*** TO BE DONE END ***/
 		}
 		if (c->out_pathname) {
 			assert(a == (l->n_commands-1));
-			/* Open c->out_pathname and assign the file-descriptor to curr_stdout
-			 * (handling error cases) */
 			/*** TO BE DONE START ***/
+			curr_stdout = open (c->out_pathname, O_CREAT|O_RDWR|O_TRUNC, 0644);
 
-			curr_stdout = open(c->out_pathname, O_RDWR);
 			if(curr_stdout == -1)
-				fatal_errno("opening error!");
+				fatal_errno("opening out error!");
 
 			/*** TO BE DONE END ***/
 		} else if (a != (l->n_commands - 1)) { /* unless we're processing the last command, we need to connect the current command and the next one with a pipe */
@@ -410,7 +435,7 @@ void execute_line(const line_t * const l)
 			/*** TO BE DONE START ***/
 
 			if(pipe2(fds, O_CLOEXEC) == -1)
-				fatal_errno("opening error!");
+				fatal_errno("pipe2 error!");
 
 			/*** TO BE DONE END ***/
 			curr_stdout = fds[1];
@@ -446,7 +471,7 @@ int main()
 		 * The memory area must be allocated (directly or indirectly) via malloc.
 		 */
 		/*** TO BE DONE START ***/
-		
+
 		pwd = NULL;
 		pwd = getcwd(pwd, 0);
 		if(pwd == NULL)
