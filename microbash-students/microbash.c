@@ -191,8 +191,11 @@ command_t *parse_cmd(char * const cmdstr)
 				/*** TO BE DONE START ***/
 
 				tmp = getenv(tmp+1);
-				if (tmp == NULL)
+				if (tmp == NULL){
 					tmp[1] = '\0';
+					fatal_errno("enviroment error: variable does not exist\n");
+				}
+					
 
 				// if (!tmp++)
 				// 	tmp = "";
