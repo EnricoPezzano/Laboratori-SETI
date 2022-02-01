@@ -190,19 +190,19 @@ command_t *parse_cmd(char * const cmdstr)
 				/* Make tmp point to the value of the corresponding environment variable, if any, or the empty string otherwise */
 				/*** TO BE DONE START ***/
 
-				// tmp = getenv(tmp+1);
-				// if (tmp == NULL)
-				// 	tmp[1] = "\0";
+				tmp = getenv(tmp+1);
+				if (tmp == NULL)
+					tmp[1] = "\0";
 
-				if (!tmp++)
-					tmp = "";
-				else
-					tmp = getenv(tmp);
+				// if (!tmp++)
+				// 	tmp = "";
+				// else
+				// 	tmp = getenv(tmp);
 
-				if (!tmp){
-					fprintf(stderr, "Environment variable error: variable doesn't exists\n");
-					goto fail;
-				}
+				// if (!tmp){
+				// 	fprintf(stderr, "Environment variable error: variable doesn't exists\n");
+				// 	goto fail;
+				// }
 
 
 				/*** TO BE DONE END ***/
