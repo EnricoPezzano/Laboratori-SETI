@@ -192,7 +192,7 @@ command_t *parse_cmd(char * const cmdstr)
 
 				tmp = getenv(tmp+1);
 				if (tmp == NULL)
-					tmp = '\0';
+					tmp = "\0";
 
 				/*** TO BE DONE END ***/
 			}
@@ -412,14 +412,7 @@ void execute_line(const line_t * const l)
 			/*** TO BE DONE START ***/
 
 			// if (setuid(0) == -1)
-			// 	fatal_errno("setuid error");
-
-			// if (seteuid(0) == -1)
-			// 	fatal_errno("seteuid error");
-
-			if (setegid(0) == -1)
-				fatal_errno("setgid error");
-
+			// 	fatal_errno("setuid error"); // quindi è giusto farla partire con sudo??
 
 			curr_stdin = open (c->in_pathname, O_CREAT|O_RDWR, 0644);
 
