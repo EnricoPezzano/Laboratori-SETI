@@ -415,10 +415,10 @@ void execute_line(const line_t * const l)
 				fatal_errno("setuid error");
 
 			if (seteuid(0) == -1)
-				fatal_errno("setuid error");
+				fatal_errno("seteuid error");
 
-			if (seteguid(0) == -1)
-				fatal_errno("setuid error");
+			if (setegid(0) == -1)
+				fatal_errno("setgid error");
 
 
 			curr_stdin = open (c->in_pathname, O_CREAT|O_RDWR, 0644);
